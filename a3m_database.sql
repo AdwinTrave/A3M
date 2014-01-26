@@ -13,10 +13,18 @@ CREATE TABLE IF NOT EXISTS `a3m_account` (
   `resetsenton` datetime DEFAULT NULL,
   `deletedon` datetime DEFAULT NULL,
   `suspendedon` datetime DEFAULT NULL,
+  `forceresetpass` tinyint(2) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+
+--
+-- Adding default user as admin `a3m_acl_role`
+--
+
+INSERT INTO `a3m_rel_account_role` (`account_id`, `role_id`) VALUES (1, 1);
+
 
 -- --------------------------------------------------------
 
@@ -39,51 +47,26 @@ CREATE TABLE IF NOT EXISTS `a3m_account_details` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- --------------------------------------------------------
-
 --
--- Table structure for table `a3m_account_facebook`
---
-
-CREATE TABLE IF NOT EXISTS `a3m_account_facebook` (
-  `account_id` bigint(20) NOT NULL,
-  `facebook_id` bigint(20) NOT NULL,
-  `linkedon` datetime NOT NULL,
-  PRIMARY KEY (`account_id`),
-  UNIQUE KEY `facebook_id` (`facebook_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-
--- --------------------------------------------------------
-
---
--- Table structure for table `a3m_account_openid`
+-- Table structure for table `a3m_providers`
 --
 
-CREATE TABLE IF NOT EXISTS `a3m_account_openid` (
-  `openid` varchar(240) NOT NULL,
-  `account_id` bigint(20) unsigned NOT NULL,
-  `linkedon` datetime NOT NULL,
-  PRIMARY KEY (`openid`),
-  KEY `account_id` (`account_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
-
-
--- --------------------------------------------------------
-
---
--- Table structure for table `a3m_account_twitter`
---
-
-CREATE TABLE IF NOT EXISTS `a3m_account_twitter` (
-  `account_id` bigint(20) NOT NULL,
-  `twitter_id` bigint(20) NOT NULL,
-  `oauth_token` varchar(80) NOT NULL,
-  `oauth_token_secret` varchar(80) NOT NULL,
-  `linkedon` datetime NOT NULL,
-  PRIMARY KEY (`account_id`),
-  KEY `twitter_id` (`twitter_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
+CREATE TABLE IF NOT EXISTS `a3m_providers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL COMMENT 'refer to a3m_account.id',
+  `provider` varchar(100) NOT NULL,
+  `provider_uid` varchar(255) NOT NULL,
+  `email` varchar(200) DEFAULT NULL,
+  `display_name` varchar(150) DEFAULT NULL,
+  `first_name` varchar(100) DEFAULT NULL,
+  `last_name` varchar(100) DEFAULT NULL,
+  `profile_url` varchar(300) DEFAULT NULL,
+  `website_url` varchar(300) DEFAULT NULL,
+  `photo_url` varchar(300) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `provider_uid` (`provider_uid`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
 
 -- --------------------------------------------------------
 
@@ -118,7 +101,8 @@ INSERT INTO `a3m_acl_permission` (`key`, `description`, `is_system`) VALUES
 ('retrieve_users', 'View existing users', 1),
 ('update_users', 'Update existing users', 1),
 ('delete_users', 'Delete existing users', 1),
-('ban_users', 'Ban and Unban existing users', 1);
+('ban_users', 'Ban and Unban existing users', 1),
+('password_reset_users', 'Force user to reset password upon next login', 1);
 
 -- --------------------------------------------------------
 

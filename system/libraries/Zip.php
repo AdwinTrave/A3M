@@ -279,22 +279,25 @@ class CI_Zip {
 	 * Read the contents of a file and add it to the zip
 	 *
 	 * @param	string	$path
-	 * @param	bool	$preserve_filepath
+	 * @param	bool	$archive_filepath
 	 * @return	bool
 	 */
-	public function read_file($path, $preserve_filepath = FALSE)
+	public function read_file($path, $archive_filepath = FALSE)
 	{
-		if ( ! file_exists($path))
+		if (file_exists($path) && FALSE !== ($data = file_get_contents($path)))
 		{
-			return FALSE;
-		}
-
-		if (FALSE !== ($data = file_get_contents($path)))
-		{
-			$name = str_replace('\\', '/', $path);
-			if ($preserve_filepath === FALSE)
+			if (is_string($archive_filepath))
 			{
-				$name = preg_replace('|.*/(.+)|', '\\1', $name);
+				$name = str_replace('\\', '/', $archive_filepath);
+			}
+			else
+			{
+				$name = str_replace('\\', '/', $path);
+
+				if ($preserve_filepath === FALSE)
+				{
+					$name = preg_replace('|.*/(.+)|', '\\1', $name);
+				}
 			}
 
 			$this->add_data($name, $data);
@@ -400,11 +403,19 @@ class CI_Zip {
 		}
 
 		flock($fp, LOCK_EX);
-		fwrite($fp, $this->get_zip());
+
+		for ($written = 0, $data = $this->get_zip(), $length = strlen($data); $written < $length; $written += $result)
+		{
+			if (($result = fwrite($fp, substr($data, $written))) === FALSE)
+			{
+				break;
+			}
+		}
+
 		flock($fp, LOCK_UN);
 		fclose($fp);
 
-		return TRUE;
+		return is_int($result);
 	}
 
 	// --------------------------------------------------------------------
@@ -422,8 +433,7 @@ class CI_Zip {
 			$filename .= '.zip';
 		}
 
-		$CI =& get_instance();
-		$CI->load->helper('download');
+		get_instance()->load->helper('download');
 		$get_zip = $this->get_zip();
 		$zip_content =& $get_zip;
 

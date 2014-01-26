@@ -1,4 +1,4 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /*
  * Forgot_password Controller
  */
@@ -38,7 +38,7 @@ class Forgot_password extends CI_Controller {
 
 		// Setup form validation
 		// max length as per IETF (http://www.rfc-editor.org/errata_search.php?rfc=3696&eid=1690)
-		$this->form_validation->set_error_delimiters('<span class="field_error">', '</span>');
+		$this->form_validation->set_error_delimiters('<div class="alert alert-danger">', '</div>');
 		$this->form_validation->set_rules(array(
 			array(
 				'field' => 'forgot_password_username_email',
@@ -98,7 +98,8 @@ class Forgot_password extends CI_Controller {
 					if($this->email->send())
 					{
 						// Load reset password sent view
-						$this->load->view('account/reset_password_sent', isset($data) ? $data : NULL);
+						$data['content'] = $this->load->view('account/reset_password_sent', isset($data) ? $data : NULL, TRUE);
+						$this->load->view('template', $data);
 					}
 					else
 					{
@@ -118,9 +119,15 @@ class Forgot_password extends CI_Controller {
 				$data['recaptcha'] = $this->recaptcha->load($recaptcha_result, $this->config->item("ssl_enabled"));
 
 		// Load forgot password view
-		$this->load->view('account/forgot_password', isset($data) ? $data : NULL);
+		$data['content'] = $this->load->view('account/forgot_password', isset($data) ? $data : NULL, TRUE);
+		$this->load->view('template', $data);
 	}
-
+	
+	/**
+	 * 
+	 * @param object $str Possible username or e-mail to be checked
+	 * @return boolean
+	 */
 	public function check_username_or_email($str)
 	{
 		//are we checking an email address?

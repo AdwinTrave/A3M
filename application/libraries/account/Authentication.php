@@ -21,6 +21,8 @@ class Authentication {
 		{
 			$this->CI->load->driver('session');
 		}
+		
+		log_message('debug', 'Authentication Class Initalized');
 	}
 
 	// --------------------------------------------------------------------
@@ -42,7 +44,7 @@ class Authentication {
 	 * Sign user in
 	 *
 	 * @access public
-	 * @param string  $username
+	 * @param string  $username Username or e-mail
 	 * @param string  $password
 	 * @param bool $remember
 	 * @return bool or string
@@ -50,13 +52,16 @@ class Authentication {
 	function sign_in($username, $password, $remember = FALSE)
 	{
 		// Get user by username / email
+		$this->CI->load->model('account/Account_model');
+		
 		if ( ! $user = $this->CI->Account_model->get_by_username_email($username))
 		{
 			return FALSE;
 		}
 		else
 		{
-			if($validation = $this->check_user_validation_suspend($user) === TRUE)
+			$validation = $this->check_user_validation_suspend($user);
+			if($validation != 'invalid' || $validation != 'suspended')
 			{
 				// Check password
 				if ( ! $this->check_password($user->password, $password))
@@ -102,6 +107,15 @@ class Authentication {
 		
 		$this->CI->Account_model->update_last_signed_in_datetime($account_id);
 		
+		//check if they need to reset password
+		$account = $this->CI->Account_model->get_by_id($account_id);
+		
+		if($account->forceresetpass)
+		{
+			//redirect to password page
+			redirect(base_url('account/password/'));
+		}
+		
 		// Redirect signed in user with session redirect
 		if ($redirect = $this->CI->session->userdata('sign_in_redirect'))
 		{
@@ -114,6 +128,7 @@ class Authentication {
 			redirect($this->CI->input->get('continue'));
 		}
 		
+		//change this URL for default redirect after sign in
 		redirect(base_url());
 	}
 
@@ -138,7 +153,7 @@ class Authentication {
 	 * Check password validity
 	 *
 	 * @access private
-	 * @param object $account
+	 * @param string $password_hash
 	 * @param string $password
 	 * @return bool
 	 */
@@ -161,13 +176,13 @@ class Authentication {
 	 */
 	private function check_user_validation_suspend($account)
 	{
-		if($account->verifiedon == NULL && $this->CI->config->item('account_email_validation_required'))
+		if($account->verifiedon === NULL && $this->CI->config->item('account_email_validation_required'))
 		{
-			return 'invalid';
+			return "invalid";
 		}
 		elseif($account->suspendedon != NULL)
 		{
-			return 'suspended';
+			return "suspended";
 		}
 		else
 		{

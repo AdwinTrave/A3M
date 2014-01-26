@@ -1,4 +1,4 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /*
  * Manage_permissions Controller
  */
@@ -36,7 +36,7 @@ class Manage_permissions extends CI_Controller {
     // Redirect unauthorized users to account profile page
     if ( ! $this->authorization->is_permitted('retrieve_permissions'))
     {
-      redirect('account/account_profile');
+      redirect('account/profile');
     }
 
     // Retrieve sign in user
@@ -78,7 +78,8 @@ class Manage_permissions extends CI_Controller {
     }
 
     // Load manage permissions view
-    $this->load->view('admin/manage_permissions', $data);
+    $data['content'] = $this->load->view('admin/manage_permissions', $data, TRUE);
+    $this->load->view('template', $data);
   }
 
 
@@ -102,7 +103,7 @@ class Manage_permissions extends CI_Controller {
     // Redirect unauthorized users to account profile page
     if ( ! $this->authorization->is_permitted('retrieve_permissions'))
     {
-      redirect('account/account_profile');
+      redirect('account/profile');
     }
 
     // Retrieve sign in user
@@ -128,17 +129,17 @@ class Manage_permissions extends CI_Controller {
     }
 
     // Setup form validation
-    $this->form_validation->set_error_delimiters('<div class="field_error">', '</div>');
+    $this->form_validation->set_error_delimiters('<div class="alert alert-danger">', '</div>');
     $this->form_validation->set_rules(
       array(
         array(
           'field' => 'permission_key',
           'label' => 'lang:permissions_key',
-          'rules' => 'trim|required|max_length[80]'),
+          'rules' => 'trim|required|alpha_dash|max_length[80]|xss_clean'),
         array(
           'field' => 'permission_description',
           'label' => 'lang:permissions_description',
-          'rules' => 'trim|optional|max_length[160]')
+          'rules' => 'trim|max_length[160]|xss_clean')
       ));
 
     // Run form validation
@@ -198,7 +199,8 @@ class Manage_permissions extends CI_Controller {
       }
     }
     // Load manage permissions view
-    $this->load->view('admin/manage_permissions_save', $data);
+    $data['content'] = $this->load->view('admin/manage_permissions_save', $data, TRUE);
+    $this->load->view('template', $data);
   }
 
   /**

@@ -1,4 +1,4 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /*
  * Reset_password Controller
  */
@@ -45,7 +45,8 @@ class Reset_password extends CI_Controller {
 			$data['recaptcha'] = $this->recaptcha->load($recaptcha_result, $this->config->item("ssl_enabled"));
 
 			// Load reset password captcha view
-			$this->load->view('account/reset_password_captcha', isset($data) ? $data : NULL);
+			$data['content'] = $this->load->view('account/reset_password_captcha', isset($data) ? $data : NULL, TRUE);
+			$this->load->view('template', $data);
 			return;
 		}
 
@@ -62,7 +63,7 @@ class Reset_password extends CI_Controller {
 					$this->Account_model->remove_reset_sent_datetime($account->id);
 
 					// Upon sign in, redirect to change password page
-					$this->session->set_userdata('sign_in_redirect', 'account/account_password');
+					$this->session->set_userdata('sign_in_redirect', 'account/password');
 
 					// Run sign in routine
 					$this->authentication->sign_in_by_id($account->id);
@@ -71,7 +72,8 @@ class Reset_password extends CI_Controller {
 		}
 
 		// Load reset password unsuccessful view
-		$this->load->view('account/reset_password_unsuccessful', isset($data) ? $data : NULL);
+		$data['content'] = $this->load->view('account/reset_password_unsuccessful', isset($data) ? $data : NULL, TRUE);
+		$this->load->view('template', $data);
 	}
 
 }
