@@ -1,31 +1,27 @@
-# [A3M (Account Authentication & Authorization)] (https://github.com/donjakobo/A3M/)
-_2/25/2013 - Currently some code is semi-stable, please fork and help squash bugs/update views_
-_6/25/2013 - Started working on integrating the main code with admin panel and the development version of CodeIgniter 3_
+A3M  
+=== 
 
-A CodeIgniter 3.x package that leverages bleeding edge web technologies like OpenID and OAuth to create a user-friendly user experience. It gives you the CRUD to get working right away without too much fuss! A3M is a full package meant for building websites from scratch without all that tiresome login / logout / admin stuff thats always required.
+A3M (Account Authentication & Authorization) is a CodeIgniter 2.x and 3-dev package that leverages bleeding edge web technologies 
+like OpenID and OAuth to create a user-friendly user experience. It gives you the CRUD to get working right away 
+without too much fuss and tinkering! Designed for building webapps from scratch without all that tiresome 
+login / logout / admin stuff thats always required.
 
-## Authors
+## Original Authors
 
-**Jakub**   			
-+ [@kubanishku](https://twitter.com/kubanishku/) on Twitter    
-+ [@donjakobo](https://github.com/donjakobo) on GitHub   
-	
-**PengKong**   
-+ [@pengkong](https://github.com/pengkong) on Github   
-        
+**Jakub** [@kubanishku](https://twitter.com/kubanishku/)  
+**PengKong** [@pengkong](https://github.com/pengkong)
+		
 ## Key Features & Design Goals
-
-See our **[app task board on Trello](https://trello.com/board/a3m/512c08b874b855f26200e690)** to get a glimps of to-do items
 
 * Native Sign Up, Sign In with 'Remember me' and Sign Out  
 * Native account Forgot Password and Reset Password  
 * Facebook/Twitter/Google/Yahoo/OpenID Sign Up, Sign In and Sign Out  
 * Manage Account Details, Profile Details and Linked Accounts  
 * reCAPTCHA Support, SSL Support, Language Files Support  
-* Gravatar support for picture selection (via account profile) **(NEW)**
-* Create a painless user experience for sign up and sign in  
-* Create code that is easily understood and re-purposed  
-* Utilize Twitter Bootstrap (a fantastic CSS / JS library)  
+* Gravatar support for picture selection (via account profile)
+* Create a painless user experience for sign up and sign in
+* Create code that is easily understood and re-purposed
+* Utilize Twitter Bootstrap 3 (a fantastic CSS / JS library)
 * Graceful degradation of JavaScript and CSS  
 * Proper usage of CodeIgniter's libraries, helpers and plugins  
 * Easily Configurable via config file  
@@ -40,7 +36,7 @@ See our **[app task board on Trello](https://trello.com/board/a3m/512c08b874b855
 ## 3rd Party Libraries & Plugins
 
 * [recaptcha_pi.php](http://code.google.com/p/recaptcha/) - recaptcha-php-1.11
-* [facebook_pi.php](https://github.com/facebook/facebook-php-sdk/) - v.3.2.2 
+* [facebook_pi.php](https://github.com/facebook/facebook-php-sdk/) - v.3.2.3
 * [twitter_pi.php](https://github.com/jmathai/twitter-async) - Updated to latest release - [Jun 21, 2013](https://github.com/jmathai/twitter-async/commits/master)  
 * [phpass_pi.php](http://www.openwall.com/phpass/) - Version 0.3 / genuine _(latest)_ 
 * [openid_pi.php](http://sourcecookbook.com/en/recipes/60/janrain-s-php-openid-library-fixed-for-php-5-3-and-how-i-did-it) - php-openid-php5.3  
@@ -48,87 +44,17 @@ See our **[app task board on Trello](https://trello.com/board/a3m/512c08b874b855
 
 ## Dependencies
 
+* PHP 5.3
 * CURL
 * DOM or domxml 
 * GMP or Bcmatch
 
 ## Installation Instructions
+Check out our wiki: https://github.com/donjakobo/A3M/wiki/Installation-Instructions
+for help on getting started.
 
-+ Download the latest version of [A3M](https://github.com/donjakobo/A3M/)
-+ Extract to a folder accessible on your webserver (`/` or something like `/a3m/` )  
-+ Create a database by importing `a3m_database.sql` script found it root folder of package  
-+ Configure `/applicaion/config/config.php` & `database.php` to match your CI setup (domain + database credentials)  
-+ Modify `.htaccess` file if your app location is different than `/` (example: `domain.com/a3m/`)  
-+ Configure `/applicaion/config/account/*` files to reflect your setup (reCAPTCHA, twitter, facebook, openid providers, etc;)
-
-### Twitter configuration:
-##### Twitter site (`https://dev.twitter.com/apps`)
-+ Create an App and note down the "Consumer key" and "Consumer secret" values
-+ Callback URL: `https://www.yoursite.com/account/connect_twitter/`
-+ Allow this application to be used to Sign in with Twitter [X]
-
-##### A3M
-+ Edit `application/config/account/twitter.php` and insert your consumer key and consumer secret.
-
-##### Testing on localhost
-+ localhost and 127.0.0.1 will not work. Use your internal IP (eg. 192.168.1.10)
-
-### Facebook configuration:
-##### Facebook Developers site (`https://developers.facebook.com/apps`)
-+ Create new App
-+ Note down "App ID" and "App Secret" values
-+ Tick "Website with Facebook Login" URL: `http://www.yoursite.com`
-
-##### A3M
-+ Edit `application/config/account/twitter.php` and insert your consumer key and consumer secret.
-
-##### Testing on localhost
-+ Facebook login seems to only work on a live environment (see https://github.com/donjakobo/A3M/issues/3)
-
-### Google / OpenID configuration:
-+ Those should work out of the box. No further configuration needed.
-
-##### Testing on localhost
-+ Some webservers (XAMMP) have outdated certificates. If you get a `Fatal error: Call to a member function addExtension() on a non-object in` error you must do the following:
-	
-	edit 
-	`application/helpers/account/Auth/Yadis/ParanoidHTTPFetcher.php` and add
-	`curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);` after line 140 (before `curl_exec($c);`)
-
-	**WARNING: DO NOT DO THIS ON YOUR PRODUCTION/LIVE WEB SERVER AS THIS LEAVES YOUR SERVER VURNERABLE TO MITM ATACKS**
-
-### Yahoo! configuration:
-+ No further configuration needed.
-
-##### Testing on localhost
-+ Testing on localhost works without any changes.
-
-## Authorization, Roles, and Permissions:
-
-+ Connect to your database and insert a new row into the "a3m_rel_account_role" with the Role ID for Admin (by default this is "1") and the Account ID you want to give Admin Rights to.
-+ After you login to the website you should see a few new options under your account for Manage Users, Manage Roles, and Manage Permissions.
-
-### Example: Create an Authors Role with permissions to "Post New Articles".
-
-+ Go to "Manage Roles" and create the new "Authors" role. 
-  + Name: Authors
-  + Description: Website Authors that are allowed to post new articles.
-  + Permissions: None
-+ Jump to "Manage Permissions" and create the "Post New Articles" permission: 
-  + Key: post_articles
-  + Description: Post New Articles
-  + Roles: Check the "Authors" Role
-+ Now you can check if the currently logged in user has access to certain features in your Controllers. You simply pass in the "Key" of the permission you created, in this case that is "post_articles".
-    
-  `$this->authorization->is_permitted('post_articles'); //returns boolean value`
-
-
-## Note
-+ The current codebase is _unstable_ due to a large re-write effort of the original application. Some controllers/views may need to be updated to work correctly. Please fork and help out!
-+ Note that twitter doesn't work if your base url is `localhost` and facebook won't work if your base url is `127.0.0.1`. Therefore ensure that your base url is something like `yoursite.com`. One way to do that is to simply [map the hostname](http://en.wikipedia.org/wiki/Hosts_%28file%29) your want to `127.0.0.1` on your development machine.
-Your twitter callback URL should take into account whether or not you have enabled SSL in your a3m config   
- + `https://domain.com/account/connect_twitter` (SSL **Enabled**) 
- + `http://domain.com/account/connect_twitter` (SSL Disabled) 
-
-Configuring this wrongly will result in an `EpiOAuthUnauthorizedException` exception being thrown.
+## Help and Support  
+* Found a bug? Try forking and fixing it. 
+* Open an issue if you want to discuss/highlight it
+* Go to StackOverflow under the tag `codeigniter-a3m` http://stackoverflow.com/questions/tagged/codeigniter-a3m if you have implementation issues (installation problems, etc;)
 

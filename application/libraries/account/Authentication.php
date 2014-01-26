@@ -21,6 +21,8 @@ class Authentication {
 		{
 			$this->CI->load->driver('session');
 		}
+		
+		log_message('debug', 'Authentication Class Initalized');
 	}
 
 	// --------------------------------------------------------------------
@@ -42,21 +44,78 @@ class Authentication {
 	 * Sign user in
 	 *
 	 * @access public
+	 * @param string  $username Username or e-mail
+	 * @param string  $password
+	 * @param bool $remember
+	 * @return bool or string
+	 */
+	function sign_in($username, $password, $remember = FALSE)
+	{
+		// Get user by username / email
+		$this->CI->load->model('account/Account_model');
+		
+		if ( ! $user = $this->CI->Account_model->get_by_username_email($username))
+		{
+			return FALSE;
+		}
+		else
+		{
+			$validation = $this->check_user_validation_suspend($user);
+			if($validation != 'invalid' || $validation != 'suspended')
+			{
+				// Check password
+				if ( ! $this->check_password($user->password, $password))
+				{
+					// Increment sign in failed attempts
+					$this->CI->session->set_userdata('sign_in_failed_attempts', (int)$this->CI->session->userdata('sign_in_failed_attempts') + 1);
+					
+					return FALSE;
+				}
+				else
+				{
+					$this->sign_in_by_id($user->id, $remember);
+				}
+			}
+			else
+			{
+				return $validation;
+			}
+		}
+	}
+	
+	/**
+	 * Sign user in by id
+	 * Used for things like forgotten password, otherwise it should not be used
+	 * as it doesn't do any checks on validity of the sign in.
+	 *
+	 * @access public
 	 * @param int  $account_id
 	 * @param bool $remember
 	 * @return void
 	 */
-	function sign_in($account_id, $remember = FALSE)
+	function sign_in_by_id($account_id, $remember = FALSE)
 	{
-		//Due to new functionality in CI3 remember me feature is temporarily disabled
-		//$remember ? $this->CI->session->cookie_monster(TRUE) : $this->CI->session->cookie_monster(FALSE);
-
+		// Clear sign in fail counter
+		$this->CI->session->unset_userdata('sign_in_failed_attempts');
+		
+		//This needs more testing to make sure that is works properly as many changes were made to this due to CI3 upgrade
+		$remember ? $this->CI->session->cookie->cookie_monster(TRUE) : $this->CI->session->cookie->cookie_monster(FALSE);
+		
 		$this->CI->session->set_userdata('account_id', $account_id);
-
-		$this->CI->load->model('account/account_model');
-
-		$this->CI->account_model->update_last_signed_in_datetime($account_id);
-
+		
+		$this->CI->load->model('account/Account_model');
+		
+		$this->CI->Account_model->update_last_signed_in_datetime($account_id);
+		
+		//check if they need to reset password
+		$account = $this->CI->Account_model->get_by_id($account_id);
+		
+		if($account->forceresetpass)
+		{
+			//redirect to password page
+			redirect(base_url('account/password/'));
+		}
+		
 		// Redirect signed in user with session redirect
 		if ($redirect = $this->CI->session->userdata('sign_in_redirect'))
 		{
@@ -68,8 +127,9 @@ class Authentication {
 		{
 			redirect($this->CI->input->get('continue'));
 		}
-
-		redirect('');
+		
+		//change this URL for default redirect after sign in
+		redirect(base_url());
 	}
 
 	// --------------------------------------------------------------------
@@ -83,6 +143,8 @@ class Authentication {
 	function sign_out()
 	{
 		$this->CI->session->unset_userdata('account_id');
+		
+		redirect('');
 	}
 
 	// --------------------------------------------------------------------
@@ -90,12 +152,12 @@ class Authentication {
 	/**
 	 * Check password validity
 	 *
-	 * @access public
-	 * @param object $account
+	 * @access private
+	 * @param string $password_hash
 	 * @param string $password
 	 * @return bool
 	 */
-	function check_password($password_hash, $password)
+	private function check_password($password_hash, $password)
 	{
 		$this->CI->load->helper('account/phpass');
 
@@ -103,7 +165,30 @@ class Authentication {
 
 		return $hasher->CheckPassword($password, $password_hash) ? TRUE : FALSE;
 	}
-
+	
+	/**
+	 * Check if user is allowed to sign in
+	 * Checks if user has been suspended or hasn't validated their e-mail yet
+	 *
+	 * @access private
+	 * @param object $account
+	 * @return bool
+	 */
+	private function check_user_validation_suspend($account)
+	{
+		if($account->verifiedon === NULL && $this->CI->config->item('account_email_validation_required'))
+		{
+			return "invalid";
+		}
+		elseif($account->suspendedon != NULL)
+		{
+			return "suspended";
+		}
+		else
+		{
+			return TRUE;
+		}
+	}
 }
 
 

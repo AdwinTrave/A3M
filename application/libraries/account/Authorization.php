@@ -21,6 +21,8 @@ class Authorization {
     {
       $this->CI->load->driver('session');
     }
+    
+    log_message('debug', 'Authorization Class Initalized');
   }
 
   /**
@@ -34,9 +36,9 @@ class Authorization {
   {
     $account_id = $this->CI->session->userdata('account_id');
 
-    $this->CI->load->model('account/acl_permission_model');
+    $this->CI->load->model('account/Acl_permission_model');
 
-    $account_permissions = $this->CI->acl_permission_model->get_by_account_id($account_id);
+    $account_permissions = $this->CI->Acl_permission_model->get_by_account_id($account_id);
 
     // Loop through and check if the account 
     // has any of the permission keys supplied
@@ -95,19 +97,36 @@ class Authorization {
   // --------------------------------------------------------------------
   
   /**
-   * Check if user has permission
+   * Check if user is admin
    *
    * @access public
-   * @param string $permission_key
    * @return bool
    */
   function is_admin()
   {
     $account_id = $this->CI->session->userdata('account_id');
 
-    $this->CI->load->model('account/acl_role_model');
+    $this->CI->load->model('account/Acl_role_model');
 
-    return $this->CI->acl_role_model->has_role('Admin', $account_id);
+    return $this->CI->Acl_role_model->has_role('Admin', $account_id);
+  }
+  
+  // --------------------------------------------------------------------
+  
+  /**
+   * Check if user is a specific role
+   *
+   * @access public
+   * @param string $role
+   * @return bool
+   */
+  function is_role($role)
+  {
+    $account_id = $this->CI->session->userdata('account_id');
+    
+    $this->CI->load->model('account/Acl_role_model');
+    
+    return $this->CI->Acl_role_model->has_role($role, $account_id);
   }
 
 }
@@ -115,7 +134,3 @@ class Authorization {
 
 /* End of file Authorization.php */
 /* Location: ./application/account/libraries/Authorization.php */
-
-// --------------------------------------------------------------------
-  
-  
