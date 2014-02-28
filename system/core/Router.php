@@ -18,7 +18,7 @@
  *
  * @package		CodeIgniter
  * @author		EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2013, EllisLab, Inc. (http://ellislab.com/)
+ * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (http://ellislab.com/)
  * @license		http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  * @link		http://codeigniter.com
  * @since		Version 1.0
@@ -109,10 +109,8 @@ class CI_Router {
 	 *
 	 * @return	void
 	 */
-	public function __construct()
+	public function __construct($routing = NULL)
 	{
-		global $routing;
-
 		$this->config =& load_class('Config', 'core');
 		$this->uri =& load_class('URI', 'core');
 
@@ -120,7 +118,7 @@ class CI_Router {
 		$this->_set_routing();
 
 		// Set any routing overrides that may exist in the main index file
-		if (isset($routing) && is_array($routing))
+		if (is_array($routing))
 		{
 			if (isset($routing['directory']))
 			{

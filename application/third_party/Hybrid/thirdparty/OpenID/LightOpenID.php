@@ -511,6 +511,7 @@ class LightOpenID
 
                 if (isset($headers['content-type'])
                     && (strpos($headers['content-type'], 'application/xrds+xml') !== false
+                        || strpos($headers['content-type'], 'text/html') !== false
                         || strpos($headers['content-type'], 'text/xml') !== false)
                 ) {
                     # Apparently, some providers return XRDS documents as text/html.

@@ -1,10 +1,11 @@
 ## v2.0.0
-* New feature: #78, #59, #27 HybridAuth was integrated into A3M, which means that the old socil logins no longer work.
+* New feature: #78, #59, #27 HybridAuth was integrated into A3M, which means that the old social logins no longer work.
 * New feature: #30 Verify e-mail upon sign-up (can be now enabled in config).
 * New feature: Default user group can be set in config.
 * New feature: Added jQuery validation to sign up page.
 * New feature: #74 Force user to reset password upon next sign-in
 * New feature: #75 Option to send user credentials to new user created via administration
+* Update: Update to jQuery 2.1.0
 * Update: Updated Twitter Bootstrap to 3.1.0
 * Update: #70 Updated to Twitter Bootstrap 3.0.3
 * Update: #47 Updated to CodeIgniter 3.
@@ -13,7 +14,7 @@
 * Change: Changed how views are called. Now using a template into which all views are inserted.
 
 ## v1.0.1
-* New Feature: # First created user automatically becomes admin
+* New Feature: First created user automatically becomes admin (https://github.com/donjakobo/A3M/commit/2d79aa3)
 
 ## v1.0.0
 * New feature: Admin panel

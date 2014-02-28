@@ -18,7 +18,7 @@
  *
  * @package		CodeIgniter
  * @author		EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2013, EllisLab, Inc. (http://ellislab.com/)
+ * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (http://ellislab.com/)
  * @license		http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  * @link		http://codeigniter.com
  * @since		Version 1.0
@@ -376,7 +376,13 @@ class CI_Email {
 	 *
 	 * @var	string[]
 	 */
-	protected $_priorities		= array('1 (Highest)', '2 (High)', '3 (Normal)', '4 (Low)', '5 (Lowest)');
+	protected $_priorities = array(
+		1 => '1 (Highest)',
+		2 => '2 (High)',
+		3 => '3 (Normal)',
+		4 => '4 (Low)',
+		5 => '5 (Lowest)'
+	);
 
 	// --------------------------------------------------------------------
 
@@ -401,7 +407,7 @@ class CI_Email {
 			$this->_smtp_auth = ! ($this->smtp_user === '' && $this->smtp_pass === '');
 		}
 
-		$this->_safe_mode = ( ! is_php('5.4') && (bool) @ini_get('safe_mode'));
+		$this->_safe_mode = ( ! is_php('5.4') && ini_get('safe_mode'));
 		$this->charset = strtoupper($this->charset);
 
 		log_message('debug', 'Email Class Initialized');
@@ -822,7 +828,7 @@ class CI_Email {
 	 * @param	string
 	 * @return	CI_Email
 	 */
-	public function set_alt_message($str = '')
+	public function set_alt_message($str)
 	{
 		$this->alt_message = (string) $str;
 		return $this;
@@ -1241,7 +1247,7 @@ class CI_Email {
 	{
 		$this->set_header('X-Sender', $this->clean_email($this->_headers['From']));
 		$this->set_header('X-Mailer', $this->useragent);
-		$this->set_header('X-Priority', $this->_priorities[$this->priority - 1]);
+		$this->set_header('X-Priority', $this->_priorities[$this->priority]);
 		$this->set_header('Message-ID', $this->_get_message_id());
 		$this->set_header('Mime-Version', '1.0');
 	}
@@ -1544,7 +1550,7 @@ class CI_Email {
 			{
 				return mb_encode_mimeheader($str, $this->charset, 'Q', $this->crlf);
 			}
-			elseif (extension_loaded('iconv'))
+			elseif (ICONV_ENABLED === TRUE)
 			{
 				$output = @iconv_mime_encode('', $str,
 					array(
@@ -1573,9 +1579,9 @@ class CI_Email {
 		isset($chars) OR $chars = strlen($str);
 
 		$output = '=?'.$this->charset.'?Q?';
-		for ($i = 0, $length = strlen($output), $iconv = extension_loaded('iconv'); $i < $chars; $i++)
+		for ($i = 0, $length = strlen($output); $i < $chars; $i++)
 		{
-			$chr = ($this->charset === 'UTF-8' && $iconv === TRUE)
+			$chr = ($this->charset === 'UTF-8' && ICONV_ENABLED === TRUE)
 				? '='.implode('=', str_split(strtoupper(bin2hex(iconv_substr($str, $i, 1, $this->charset))), 2))
 				: '='.strtoupper(bin2hex($str[$i]));
 

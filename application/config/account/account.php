@@ -58,7 +58,7 @@ $config['third_party_auth'] = array(
 
         "Yahoo" => array (
                 "enabled" => FALSE,
-                "keys"    => array ( "id" => "", "secret" => "" ),
+                "keys"    => array ( "key" => "", "secret" => "" ),
         ),
 
         "AOL"  => array (
@@ -72,12 +72,12 @@ $config['third_party_auth'] = array(
 
         "Facebook" => array (
                 "enabled" => true,
-                "keys"    => array ( "id" => "464764366948522", "secret" => "cf8e6a9331fc0d947f0ab776e4290b5c" ),
+                "keys"    => array ( "id" => "", "secret" => "" ),
         ),
 
         "Twitter" => array (
                 "enabled" => true,
-                "keys"    => array ( "key" => "9QqvcR2WkK9Ki1Mi1vkSnw", "secret" => "FamNmwSV3FGJ4wMNEHuw6LN26PhlD2reOIctpvNqias" )
+                "keys"    => array ( "key" => "", "secret" => "" )
         ),
 
         // windows live
@@ -93,7 +93,7 @@ $config['third_party_auth'] = array(
 
         "LinkedIn" => array (
                 "enabled" => TRUE,
-                "keys"    => array ( "key" => "77d2ggniatdzlf", "secret" => "TDoEdghviAleMmcZ" )
+                "keys"    => array ( "key" => "", "secret" => "" )
         ),
 
         "Foursquare" => array (
