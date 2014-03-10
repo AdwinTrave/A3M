@@ -49,7 +49,7 @@ class LightOpenID
             $this->trustRoot = (strpos($host, '://') ? $host : 'https://' . $host);
         }
 
-        if(($host_end = strpos($this->trustRoot, '/', 8)) !== false) {
+        if(strlen($this->trustRoot >= 8) && ($host_end = strpos($this->trustRoot, '/', 8)) !== false) {
             $this->trustRoot = substr($this->trustRoot, 0, $host_end);
         }
         
@@ -204,6 +204,9 @@ class LightOpenID
             curl_setopt($curl, CURLOPT_HTTPGET, true);
         }
         $response = curl_exec($curl);
+        if( $response === FALSE ) {
+            Hybrid_Logger::error( "LightOpenID::request_curl(). curl_exec error: ", curl_error($ch) );
+        }
 
         if($method == 'HEAD' && curl_getinfo($curl, CURLINFO_HTTP_CODE) == 405) {
             curl_setopt($curl, CURLOPT_HTTPGET, true);
@@ -511,7 +514,6 @@ class LightOpenID
 
                 if (isset($headers['content-type'])
                     && (strpos($headers['content-type'], 'application/xrds+xml') !== false
-                        || strpos($headers['content-type'], 'text/html') !== false
                         || strpos($headers['content-type'], 'text/xml') !== false)
                 ) {
                     # Apparently, some providers return XRDS documents as text/html.

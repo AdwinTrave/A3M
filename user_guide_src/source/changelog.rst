@@ -86,7 +86,8 @@ Release Date: Not Released
 
       - Added more doctypes.
       - Changed application and environment config files to be loaded in a cascade-like manner.
-      - The doctypes array is now cached and loaded only once.
+      - Changed :func:`doctype()` to cache and only load once the doctypes array.
+      - Deprecated functions ``nbs()`` and ``br()``, which are just aliases for the native ``str_repeat()`` with ``&nbsp;`` and ``<br />`` respectively.
 
    -  :doc:`Inflector Helper <helpers/inflector_helper>` changes include:
 
@@ -155,8 +156,9 @@ Release Date: Not Released
    -  Renamed internal method ``_escape_identifiers()`` to ``escape_identifiers()``.
    -  Updated ``escape_identifiers()`` to accept an array of fields as well as strings.
    -  MySQL and MySQLi drivers now require at least MySQL version 5.1.
+   -  Added a ``$persistent`` parameter to ``db_connect()`` and changed ``db_pconnect()`` to be an alias for ``db_connect(TRUE)``.
    -  ``db_set_charset()`` now only requires one parameter (collation was only needed due to legacy support for MySQL versions prior to 5.1).
-   -  ``db_select()`` will now always (if required by the driver) be called by ``db_connect()`` / ``db_pconnect()`` instead of only when initializing.
+   -  ``db_select()`` will now always (if required by the driver) be called by ``db_connect()`` instead of only when initializing.
    -  Replaced the ``_error_message()`` and ``_error_number()`` methods with ``error()``, which returns an array containing the last database error code and message.
    -  Improved ``version()`` implementation so that drivers that have a native function to get the version number don't have to be defined in the core ``DB_driver`` class.
    -  Added capability for packages to hold *config/database.php* config files.
@@ -290,6 +292,7 @@ Release Date: Not Released
    -  :doc:`File Uploading Library <libraries/file_uploading>` changes include:
 
       -  Added method chaining support.
+      -  Added support for using array notation in file field names.
       -  Added **max_filename_increment** and **file_ext_tolower** configuration settings.
       -  Added **min_width** and **min_height** configuration settings for images.
       -  Added **mod_mime_fix** configuration setting to disable suffixing multiple file extensions with an underscore.
@@ -463,6 +466,7 @@ Release Date: Not Released
       -  Changed method ``_fetch_from_array()`` to parse array notation in field name.
       -  Added an option for ``_clean_input_keys()`` to return FALSE instead of terminating the whole script.
       -  Deprecated the ``is_cli_request()`` method, it is now an alias for the new :func:`is_cli()` common function.
+      -  Added an ``$xss_clean`` parameter to method ``user_agent()`` and removed the ``$user_agent`` property.
 
    -  :doc:`Common functions <general/common_functions>` changes include:
 
