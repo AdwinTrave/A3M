@@ -109,23 +109,3 @@ input.openid {
 .accountPicSelect input[type="radio"] {
 	margin: 0 10px 0 0;
 }
-
-
-
-/* Positioning */
-
-.right {
-	text-align: right;
-}
-
-.center {
-	text-align: center;
-}
-
-.clearfix:after {
-	content: ".";
-	display: block;
-	height: 0;
-	clear: both;
-	visibility: hidden;
-}

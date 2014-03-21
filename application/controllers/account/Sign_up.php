@@ -41,7 +41,22 @@ class Sign_up extends CI_Controller {
 
 		// Setup form validation
 		$this->form_validation->set_error_delimiters('<div class="alert alert-danger">', '</div>');
-		$this->form_validation->set_rules(array(array('field' => 'sign_up_username', 'label' => 'lang:sign_up_username', 'rules' => 'trim|required|alpha_dash|min_length[2]|max_length[24]|callback_username_check'), array('field' => 'sign_up_password', 'label' => 'lang:sign_up_password', 'rules' => 'trim|required|min_length[6]'), array('field' => 'sign_up_email', 'label' => 'lang:sign_up_email', 'rules' => 'trim|required|valid_email|max_length[160]|callback_email_check'), array('field' => 'sign_up_confirm_password', 'label' => 'lang:sign_up_password_confirm', 'rules' => 'trim|required|min_length[6]|matches[sign_up_password]'), array('field' => 'sign_up_terms', 'label' => 'lang:sign_up_terms_confirm', 'rules' => 'trim|required')));
+		$this->form_validation->set_rules(array(
+			array('field' => 'sign_up_username',
+			      'label' => 'lang:sign_up_username',
+			      'rules' => 'trim|required|alpha_dash|min_length[2]|max_length[24]|callback_username_check'),
+			array('field' => 'sign_up_password',
+			      'label' => 'lang:sign_up_password',
+			      'rules' => 'trim|required|min_length[6]'),
+			array('field' => 'sign_up_email',
+			      'label' => 'lang:sign_up_email',
+			      'rules' => 'trim|required|valid_email|max_length[160]|callback_email_check'),
+			array('field' => 'sign_up_confirm_password',
+			      'label' => 'lang:sign_up_password_confirm',
+			      'rules' => 'trim|required|min_length[6]|matches[sign_up_password]'),
+			array('field' => 'sign_up_terms',
+			      'label' => 'lang:sign_up_terms_confirm',
+			      'rules' => 'trim|required')));
 
 		// Run form validation
 		if (($this->form_validation->run() === TRUE) && ($this->config->item("sign_up_enabled")))

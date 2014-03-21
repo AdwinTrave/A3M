@@ -88,12 +88,19 @@ class Hybrid_Providers_Google extends Hybrid_Provider_Model_OAuth2
 		$this->user->profile->region 		= (property_exists($response,'region'))?$response->region:"";
 		$this->user->profile->zip	 		= (property_exists($response,'zip'))?$response->zip:"";
 		if( property_exists($response,'placesLived') ){
-			$this->user->profile->city 		= ""; 
+			$this->user->profile->city 	= ""; 
 			$this->user->profile->address	= ""; 
 			foreach($response->placesLived as $c){
-				if($c->primary == true){ 
-					$this->user->profile->address 	= $c->value;
-					$this->user->profile->city 		= $c->value;
+				if(property_exists($c,'primary')){
+					if($c->primary == true){ 
+						$this->user->profile->address 	= $c->value;
+						$this->user->profile->city 	= $c->value;
+					}
+				}else{
+					if(property_exists($c,'value')){
+						$this->user->profile->address 	= $c->value;
+						$this->user->profile->city 	= $c->value;
+					}	
 				}
 			}
 		}
@@ -102,7 +109,7 @@ class Hybrid_Providers_Google extends Hybrid_Provider_Model_OAuth2
 		// see http://support.google.com/plus/answer/1713826?hl=en
 		if( property_exists($response,'urls') ){
 			foreach($response->urls as $u){
-				if($u->primary == true) $this->user->profile->webSiteURL = $u->value;
+				if(property_exists($u, 'primary') && $u->primary == true) $this->user->profile->webSiteURL = $u->value;
 			}
 		} else {
 			$this->user->profile->webSiteURL = '';
