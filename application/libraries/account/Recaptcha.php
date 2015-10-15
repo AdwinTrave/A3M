@@ -1,7 +1,21 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+/**
+ * Recaptcha library
+ * 
+ */
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Recaptcha {
-
+/**
+ * Recaptcha library
+ * @package A3M
+ * @subpackage Libraries
+ */
+class Recaptcha
+{
+	/**
+	 * The CodeIgniter Object
+	 * @var object
+	 */
 	var $CI;
 
 	/**
@@ -60,9 +74,6 @@ class Recaptcha {
 
 		return $captcha;
 	}
-
 }
-
-
 /* End of file Recaptcha.php */
 /* Location: ./application/account/libraries/Recaptcha.php */

@@ -16,9 +16,7 @@ the ones used by that class, otherwise your local methods will
 override them. The following is a list of reserved names. Do not name
 your controller any of these:
 
--  Controller
--  CI_Base
--  _ci_initialize
+-  CI_Controller
 -  Default
 -  index
 
@@ -41,6 +39,7 @@ Functions
 -  :php:func:`is_https()`
 -  :php:func:`function_usable()`
 -  :php:func:`get_instance()`
+-  ``_error_handler()``
 -  ``_exception_handler()``
 -  ``_stringify_attributes()``
 
@@ -61,6 +60,9 @@ Constants
 -  APPPATH
 -  VIEWPATH
 -  CI_VERSION
+-  MB_ENABLED
+-  ICONV_ENABLED
+-  UTF8_ENABLED
 -  FILE_READ_MODE
 -  FILE_WRITE_MODE
 -  DIR_READ_MODE

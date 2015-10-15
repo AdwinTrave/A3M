@@ -1,8 +1,19 @@
 <?php
-/*
- * Connect_create Controller
+/**
+ * A3M (Account Authentication & Authorization) is a CodeIgniter 3.x package.
+ * It gives you the CRUD to get working right away without too much fuss and tinkering!
+ * Designed for building webapps from scratch without all that tiresome login / logout / admin stuff thats always required.
+ *
+ * @link https://github.com/donjakobo/A3M GitHub repository
  */
-class Connect_create extends CI_Controller {
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+/**
+ * Create connection between provider and our site
+ * @package A3M
+ * @subpackage Controllers
+ */
+class Connect_create extends CI_Controller
+{
 
 	/**
 	 * Constructor
@@ -15,12 +26,12 @@ class Connect_create extends CI_Controller {
 		$this->load->config('account/account');
 		$this->load->helper(array('language', 'account/ssl', 'url'));
 		$this->load->library(array('account/authentication', 'account/authorization', 'form_validation'));
-		$this->load->model(array('account/Account_model', 'account/Account_details_model', 'account/Account_facebook_model', 'account/Account_twitter_model', 'account/Account_openid_model'));
+		$this->load->model(array('account/Account_model', 'account/Account_details_model', 'account/Account_providers_model'));
 		$this->load->language(array('general', 'account/connect_third_party'));
 	}
 
 	/**
-	 * Complete facebook's authentication process
+	 * Creates a new entry in the providers table so that user is remembered
 	 *
 	 * @access public
 	 * @return void
@@ -37,10 +48,26 @@ class Connect_create extends CI_Controller {
 		if ( ! $this->session->userdata('connect_create')) redirect('');
 
 		$data['connect_create'] = $this->session->userdata('connect_create');
+		$provider = array_keys($data['connect_create']);
+		$provider = $provider[0];
+		$data['connect_create'] = $data['connect_create'][$provider];
 
 		// Setup form validation
-		$this->form_validation->set_error_delimiters('<span class="field_error">', '</span>');
-		$this->form_validation->set_rules(array(array('field' => 'connect_create_username', 'label' => 'lang:connect_create_username', 'rules' => 'trim|required|alpha_numeric|min_length[2]|max_length[16]'), array('field' => 'connect_create_email', 'label' => 'lang:connect_create_email', 'rules' => 'trim|required|valid_email|max_length[160]')));
+		$this->form_validation->set_error_delimiters('<span class="alert alert-danger">', '</span>');
+		$this->form_validation->set_rules(array(
+                    array('field' => 'connect_create_username',
+                          'label' => 'lang:connect_create_username',
+                          'rules' => 'trim|required|alpha_numeric|min_length[2]|max_length[16]'),
+                    array('field' => 'connect_create_email',
+                          'label' => 'lang:connect_create_email',
+                          'rules' => 'trim|required|valid_email|max_length[160]'),
+                    array('field' => 'connect_password',
+                          'label' => 'lang:connect_password',
+                          'rules' => 'trim|required|min_length['.$this->config->item('sign_up_password_min_length').']'),
+                    array('field' => 'connect_confirm_password',
+			  'label' => 'lang:connect_password_confirm',
+			  'rules' => 'trim|required|min_length['.$this->config->item('sign_up_password_min_length').']|matches[connect_password]')
+                    ));
 
 		// Run form validation
 		if ($this->form_validation->run())
@@ -57,59 +84,52 @@ class Connect_create extends CI_Controller {
 			}
 			else
 			{
+				// Create user
+				$user_id = $this->Account_model->create($this->input->post('connect_create_username', TRUE), $this->input->post('connect_create_email', TRUE), $this->input->post('connect_password', TRUE));
+				//extract user details from $data['connect_create']
+				//@todo 'dateofbirth' =>
+				$user_details = array('firstname' => $data['connect_create']['firstName'], 'lastname' => $data['connect_create']['lastName'], 'gender' => $data['connect_create']['gender'], 'picture' => $data['connect_create']['photoURL']);
+
+				// Add user details
+				$this->Account_details_model->update($user_id, $user_details);
+
+				// Connect third party account to user
+				$this->Account_providers_model->insert($user_id, $provider, $data['connect_create']['identifier'], $data['connect_create']['emailVerified'], $data['connect_create']['displayName'], $data['connect_create']['firstName'], $data['connect_create']['lastName'], $data['connect_create']['profileURL'], $data['connect_create']['webSiteURL'], $data['connect_create']['photoURL']);
+
 				// Destroy 'connect_create' session data
 				$this->session->unset_userdata('connect_create');
 
-				// Create user
-				$user_id = $this->Account_model->create($this->input->post('connect_create_username', TRUE), $this->input->post('connect_create_email', TRUE));
-
-				// Add user details
-				$this->Account_details_model->update($user_id, $data['connect_create'][1]);
-
-				// Connect third party account to user
-				switch ($data['connect_create'][0]['provider'])
-				{
-					case 'facebook':
-						$this->Account_facebook_model->insert($user_id, $data['connect_create'][0]['provider_id']);
-						break;
-					case 'twitter':
-						$this->Account_twitter_model->insert($user_id, $data['connect_create'][0]['provider_id'], $data['connect_create'][0]['token'], $data['connect_create'][0]['secret']);
-						break;
-					case 'openid':
-						$this->Account_openid_model->insert($data['connect_create'][0]['provider_id'], $user_id);
-						break;
-				}
-
 				// Run sign in routine
-				$this->authentication->sign_in($user_id);
+				$this->authentication->sign_in_by_id($user_id);
 			}
 		}
 
-		$this->load->view('account/connect_create', isset($data) ? $data : NULL);
+		$data['content'] = $this->load->view('account/connect_create', isset($data) ? $data : NULL, TRUE);
+		$this->load->view('template', $data);
 	}
 
 	/**
 	 * Check if a username exist
 	 *
 	 * @access public
-	 * @param string
+	 * @param string $username
 	 * @return bool
 	 */
 	function username_check($username)
 	{
-		return $this->account_model->get_by_username($username) ? TRUE : FALSE;
+		return $this->Account_model->get_by_username($username) ? TRUE : FALSE;
 	}
 
 	/**
 	 * Check if an email exist
 	 *
 	 * @access public
-	 * @param string
+	 * @param string $email
 	 * @return bool
 	 */
 	function email_check($email)
 	{
-		return $this->account_model->get_by_email($email) ? TRUE : FALSE;
+		return $this->Account_model->get_by_email($email) ? TRUE : FALSE;
 	}
 
 }

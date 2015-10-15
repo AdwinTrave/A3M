@@ -1,8 +1,20 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
-/*
- * Sign_in Controller
+<?php
+/**
+ * A3M (Account Authentication & Authorization) is a CodeIgniter 3.x package.
+ * It gives you the CRUD to get working right away without too much fuss and tinkering!
+ * Designed for building webapps from scratch without all that tiresome login / logout / admin stuff thats always required.
+ *
+ * @link https://github.com/donjakobo/A3M GitHub repository
  */
-class Sign_in extends CI_Controller {
+defined('BASEPATH') OR exit('No direct script access allowed');
+/**
+ * Sign in
+ *
+ * @package A3M
+ * @subpackage Controllers
+ */
+class Sign_in extends CI_Controller
+{
 
 	/**
 	 * Constructor
@@ -40,7 +52,7 @@ class Sign_in extends CI_Controller {
 		$recaptcha_result = $this->recaptcha->check();
 
 		// Setup form validation
-		$this->form_validation->set_error_delimiters('<span class="field_error">', '</span>');
+		$this->form_validation->set_error_delimiters('<div class="alert alert-danger">', '</div>');
 		$this->form_validation->set_rules(array(
 			array(
 				'field' => 'sign_in_username_email',
@@ -65,45 +77,35 @@ class Sign_in extends CI_Controller {
 			else
 			{
 				// Authenticate
-				if($sign_in_error = $this->authentication->sign_in($this->input->post('sign_in_username_email', TRUE), $this->input->post('sign_in_password', TRUE), $this->input->post('sign_in_remember', TRUE)))
+				$sign_in_error = $this->authentication->sign_in($this->input->post('sign_in_username_email', TRUE), $this->input->post('sign_in_password', TRUE), $this->input->post('sign_in_remember', TRUE));
+				if($sign_in_error === "invalid")
 				{
-					//change this to redirect to page you want your users to go after logins
-					redirect(base_url());
+					//show login error
+					$data['sign_in_error'] = sprintf(lang('sign_in_non_validated_email'), $this->input->post('sign_in_username_email', TRUE));
+					
+				}
+				elseif($sign_in_error === "suspended")
+				{
+					//show login error
+					$data['sign_in_error'] = lang('sign_in_suspended_account');
 				}
 				else
 				{
-					if($sign_in_error = 'invalid')
-					{
-						//show login error
-						$data['sign_in_error'] = lang('sign_in_non_validated_email');
-						
-					}
-					elseif($sign_in_error = 'suspended')
-					{
-						//show login error
-						$data['sign_in_error'] = lang('sign_in_suspended_account');
-					}
-					else
-					{
-						//show login error
-						$data['sign_in_error'] = lang('sign_in_combination_incorrect');
-					}
-					
+					//show login error
+					$data['sign_in_error'] = lang('sign_in_combination_incorrect');
 				}
 			}
 		}
-
+		
 		// Load recaptcha code
 		if ($this->config->item("sign_in_recaptcha_enabled") === TRUE)
 			if ($this->config->item('sign_in_recaptcha_offset') <= $this->session->userdata('sign_in_failed_attempts'))
 				$data['recaptcha'] = $this->recaptcha->load($recaptcha_result, $this->config->item("ssl_enabled"));
-
+			
 		// Load sign in view
-		$this->load->view('sign_in', isset($data) ? $data : NULL);
+		$data['content'] = $this->load->view('sign_in', isset($data) ? $data : NULL, TRUE);
+		$this->load->view('template', $data);
 	}
-
 }
-
-
 /* End of file Sign_in.php */
 /* Location: ./application/controllers/account/Sign_in.php */

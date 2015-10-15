@@ -1,6 +1,24 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+/**
+ * A3M (Account Authentication & Authorization) is a CodeIgniter 3.x package.
+ * It gives you the CRUD to get working right away without too much fuss and tinkering!
+ * Designed for building webapps from scratch without all that tiresome login / logout / admin stuff thats always required.
+ *
+ * @link https://github.com/donjakobo/A3M GitHub repository
+ */
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Rel_account_permission_model extends CI_Model {
+/**
+ * Rel_account_permissions
+ *
+ * Model for the Rel_account_permissions table.
+ * Managing user's assigned permissions.
+ *
+ * @package A3M
+ * @subpackage Models
+ */
+class Rel_account_permission_model extends CI_Model
+{
 
   /**
    * Get all override account permissions
@@ -10,7 +28,7 @@ class Rel_account_permission_model extends CI_Model {
    */
   function get()
   {
-    return $this->db->get('a3m_rel_account_permission')->result();
+    return $this->db->get($this->db->dbprefix . 'a3m_rel_account_permission')->result();
   }
 
   /**
@@ -22,10 +40,10 @@ class Rel_account_permission_model extends CI_Model {
    */
   function get_by_account_id($account_id)
   {
-    $this->db->select('a3m_acl_permission.*');
-    $this->db->from('a3m_rel_account_permission');
-    $this->db->join('a3m_acl_permission', 'a3m_rel_account_permission.permission_id = a3m_acl_permission.id');
-    $this->db->where("a3m_rel_account_permission.account_id = $account_id AND a3m_acl_permission.suspendedon IS NULL");
+    $this->db->select($this->db->dbprefix . 'a3m_acl_permission.*');
+    $this->db->from($this->db->dbprefix . 'a3m_rel_account_permission');
+    $this->db->join($this->db->dbprefix . 'a3m_acl_permission', $this->db->dbprefix . 'a3m_rel_account_permission.permission_id = '.$this->db->dbprefix . 'a3m_acl_permission.id');
+    $this->db->where($this->db->dbprefix . "a3m_rel_account_permission.account_id = $account_id AND ".$this->db->dbprefix . "a3m_acl_permission.suspendedon IS NULL");
 
     return $this->db->get()->result();
   }
@@ -40,7 +58,7 @@ class Rel_account_permission_model extends CI_Model {
    */
   function exists($account_id, $permission_id)
   {
-    $this->db->from('a3m_rel_account_permission');
+    $this->db->from($this->db->dbprefix . 'a3m_rel_account_permission');
     $this->db->where('account_id', $account_id);
     $this->db->where('permission_id', $permission_id);
 
@@ -62,7 +80,7 @@ class Rel_account_permission_model extends CI_Model {
     // Insert
     if (!$this->exists($account_id, $permission_id))
     {
-      $this->db->insert('a3m_rel_account_permission', array('account_id' => $account_id, 'permission_id' => $permission_id));
+      $this->db->insert($this->db->dbprefix . 'a3m_rel_account_permission', array('account_id' => $account_id, 'permission_id' => $permission_id));
     }
   }
 
@@ -76,7 +94,7 @@ class Rel_account_permission_model extends CI_Model {
    */
   function delete($account_id, $permission_id)
   {
-    $this->db->delete('a3m_rel_account_permission', array('account_id' => $account_id, 'permission_id' => $permission_id));
+    $this->db->delete($this->db->dbprefix . 'a3m_rel_account_permission', array('account_id' => $account_id, 'permission_id' => $permission_id));
   }
 
 
@@ -90,7 +108,7 @@ class Rel_account_permission_model extends CI_Model {
    */
   function delete_by_account($account_id)
   {
-    $this->db->delete('a3m_rel_account_permission', array('account_id' => $account_id));
+    $this->db->delete($this->db->dbprefix . 'a3m_rel_account_permission', array('account_id' => $account_id));
   }
 
 
@@ -104,7 +122,7 @@ class Rel_account_permission_model extends CI_Model {
    */
   function delete_by_permission($permission_id)
   {
-    $this->db->delete('a3m_rel_account_permission', array('permission_id' => $permission_id));
+    $this->db->delete($this->db->dbprefix . 'a3m_rel_account_permission', array('permission_id' => $permission_id));
   }
 }
 

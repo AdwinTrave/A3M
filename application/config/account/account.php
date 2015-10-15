@@ -23,6 +23,9 @@ $config['sign_in_recaptcha_offset'] 	= 3;
 $config['sign_up_recaptcha_enabled'] 	= FALSE;
 $config['sign_up_auto_sign_in'] 	= TRUE;
 $config['sign_up_default_user_group']   = 2;
+$config['sign_up_username_min_length']  = 2;
+$config['sign_up_username_max_length']  = 24;
+$config['sign_up_password_min_length']  = 6;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,20 +43,68 @@ $config['forgot_password_recaptcha_enabled'] 	= TRUE;
 
 /*
 |--------------------------------------------------------------------------
-| OpenID
-|--------------------------------------------------------------------------
-*/
-$config['openid_file_store_path'] = 'application/cache';
-$config['openid_google_discovery_endpoint'] = 'http://www.google.com/accounts/o8/id';
-$config['openid_yahoo_discovery_endpoint'] = 'http://www.yahoo.com/';
-
-/*
-|--------------------------------------------------------------------------
 | Third Party Auth
+| Adding more services:
+| http://hybridauth.sourceforge.net/userguide.html
 |--------------------------------------------------------------------------
 */
-$config['third_party_auth_providers'] = array('facebook', 'twitter', 'google', 'yahoo', 'openid');
 $config['openid_what_is_url'] = 'http://openidexplained.com/';
+$config['third_party_auth'] = array(
+// set on "base_url" the relative url that point to HybridAuth Endpoint
+'base_url' => '/account/connect_end/',
+
+"providers" => array (
+        // openid providers
+        "OpenID" => array (
+                "enabled" => TRUE
+        ),
+
+        "Yahoo" => array (
+                "enabled" => FALSE,
+                "keys"    => array ( "key" => "", "secret" => "" ),
+        ),
+
+        "AOL"  => array (
+                "enabled" => TRUE
+        ),
+
+        "Google" => array (
+                "enabled" => FALSE,
+                "keys"    => array ( "id" => "", "secret" => "" ),
+        ),
+
+        "Facebook" => array (
+                "enabled" => FALSE,
+                "keys"    => array ( "id" => "", "secret" => "" ),
+        ),
+
+        "Twitter" => array (
+                "enabled" => FALSE,
+                "keys"    => array ( "key" => "", "secret" => "" )
+        ),
+
+        // windows live
+        "Live" => array (
+                "enabled" => FALSE,
+                "keys"    => array ( "id" => "", "secret" => "" )
+        ),
+
+        "LinkedIn" => array (
+                "enabled" => FALSE,
+                "keys"    => array ( "key" => "", "secret" => "" )
+        ),
+
+        "Foursquare" => array (
+                "enabled" => FALSE,
+                "keys"    => array ( "id" => "", "secret" => "" )
+        ),
+),
+
+// if you want to enable logging, set 'debug_mode' to true  then provide a writable file by the web server on "debug_file"
+"debug_mode" => (ENVIRONMENT == 'development'),
+
+"debug_file" => APPPATH.'/logs/hybridauth.log',
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -72,18 +123,17 @@ $config['password_reset_email'] 	= 'no-reply@a3m.net';
 
 /*
 |--------------------------------------------------------------------------
-| Confrimation E-mail for non-social media registration
+| Confrimation E-mail for registration
 |--------------------------------------------------------------------------
-|       account_
+|       
 |	account_email_validate               Will send out confirmation email for account email validation
 |       account_email_validation_required    Requires that the e-mail is validated before user can login
 |       account_email_confirm_sender        
+|       
 */
 $config['account_email_validate']           = TRUE;
 $config['account_email_validation_required']= TRUE;
 $config['account_email_confirm_sender']     = 'no-reply@a3m.net';
-
-
 
 /* End of file account.php */
 /* Location: ./application/account/config/account.php */

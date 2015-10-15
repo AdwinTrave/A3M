@@ -11,7 +11,7 @@ class URI_test extends CI_TestCase {
 
 	/* As of the following commit, _set_uri_string() is a protected method:
 
-		https://github.com/EllisLab/CodeIgniter/commit/d461934184d95b0cfb2feec93f27b621ef72a5c2
+		https://github.com/bcit-ci/CodeIgniter/commit/d461934184d95b0cfb2feec93f27b621ef72a5c2
 
 	public function test_set_uri_string()
 	{
@@ -25,6 +25,10 @@ class URI_test extends CI_TestCase {
 	*/
 
 	// --------------------------------------------------------------------
+
+	/*
+
+		This has been moved to the constructor
 
 	public function test_fetch_uri_string()
 	{
@@ -86,8 +90,13 @@ class URI_test extends CI_TestCase {
 		// uri_protocol: REQUEST_URI
 		// uri_protocol: CLI
 	}
+	*/
 
 	// --------------------------------------------------------------------
+
+	/*
+
+		This has been moved into _set_uri_string()
 
 	public function test_explode_segments()
 	{
@@ -107,32 +116,15 @@ class URI_test extends CI_TestCase {
 			$this->assertEquals($a, $this->uri->segments);
 		}
 	}
-
+	*/
 	// --------------------------------------------------------------------
 
-	public function test_filter_uri()
+	public function test_filter_uri_passing()
 	{
-		$this->uri->config->set_item('enable_query_strings', FALSE);
-		$this->uri->config->set_item('permitted_uri_chars', 'a-z 0-9~%.:_\-');
+		$this->uri->_set_permitted_uri_chars('a-z 0-9~%.:_\-');
 
-		$str_in = 'abc01239~%.:_-';
-		$str = $this->uri->_filter_uri($str_in);
-
-		$this->assertEquals($str, $str_in);
-	}
-
-	// --------------------------------------------------------------------
-
-	public function test_filter_uri_escaping()
-	{
-		// ensure escaping even if dodgey characters are permitted
-
-		$this->uri->config->set_item('enable_query_strings', FALSE);
-		$this->uri->config->set_item('permitted_uri_chars', 'a-z 0-9~%.:_\-()$');
-
-		$str = $this->uri->_filter_uri('$destroy_app(foo)');
-
-		$this->assertEquals($str, '&#36;destroy_app&#40;foo&#41;');
+		$str = 'abc01239~%.:_-';
+		$this->uri->filter_uri($str);
 	}
 
 	// --------------------------------------------------------------------
@@ -142,25 +134,9 @@ class URI_test extends CI_TestCase {
 		$this->setExpectedException('RuntimeException');
 
 		$this->uri->config->set_item('enable_query_strings', FALSE);
-		$this->uri->config->set_item('permitted_uri_chars', 'a-z 0-9~%.:_\-');
-		$this->uri->_filter_uri('$this()');
-	}
-
-	// --------------------------------------------------------------------
-
-	public function test_remove_url_suffix()
-	{
-		$this->uri->config->set_item('url_suffix', '.html');
-
-		$this->uri->uri_string = 'controller/method/index.html';
-		$this->uri->_remove_url_suffix();
-
-		$this->assertEquals($this->uri->uri_string, 'controller/method/index');
-
-		$this->uri->uri_string = 'controller/method/index.htmlify.html';
-		$this->uri->_remove_url_suffix();
-
-		$this->assertEquals($this->uri->uri_string, 'controller/method/index.htmlify');
+		$this->uri->_set_permitted_uri_chars('a-z 0-9~%.:_\-');
+		$segment = '$this()'; // filter_uri() accepts by reference
+		$this->uri->filter_uri($segment);
 	}
 
 	// --------------------------------------------------------------------
@@ -276,6 +252,3 @@ class URI_test extends CI_TestCase {
 	}
 
 }
-
-/* End of file URI_test.php */
-/* Location: ./tests/core/URI_test.php */

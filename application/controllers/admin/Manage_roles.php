@@ -1,9 +1,19 @@
 <?php
-/*
- * Manage_roles Controller
+/**
+ * A3M (Account Authentication & Authorization) is a CodeIgniter 3.x package.
+ * It gives you the CRUD to get working right away without too much fuss and tinkering!
+ * Designed for building webapps from scratch without all that tiresome login / logout / admin stuff thats always required.
+ *
+ * @link https://github.com/donjakobo/A3M GitHub repository
  */
-class Manage_roles extends CI_Controller {
-
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+/**
+ * Manage roles
+ * @package A3M
+ * @subpackage Controllers
+ */
+class Manage_roles extends CI_Controller
+{
   /**
    * Constructor
    */
@@ -16,31 +26,15 @@ class Manage_roles extends CI_Controller {
     $this->load->helper(array('date', 'language', 'account/ssl', 'url'));
     $this->load->library(array('account/authentication', 'account/authorization', 'form_validation'));
     $this->load->model(array('account/Account_model', 'account/Account_details_model', 'account/Acl_permission_model', 'account/Acl_role_model', 'account/Rel_account_permission_model', 'account/Rel_account_role_model', 'account/Rel_role_permission_model'));
-    $this->load->language(array('general', 'admin/manage_roles', 'account/account_settings', 'account/account_profile', 'account/sign_up', 'account/account_password'));
+    $this->load->language(array('general', 'admin/manage_roles', 'account/account_settings', 'account/sign_up', 'account/account_password'));
   }
 
   /**
-   * Manage Roles
+   * Roles overview
    */
   function index()
   {
-    // Enable SSL?
-    maintain_ssl($this->config->item("ssl_enabled"));
-
-    // Redirect unauthenticated users to signin page
-    if ( ! $this->authentication->is_signed_in())
-    {
-      redirect('account/sign_in/?continue='.urlencode(base_url().'admin/manage_roles'));
-    }
-
-    // Redirect unauthorized users to account profile page
-    if ( ! $this->authorization->is_permitted('retrieve_roles'))
-    {
-      redirect('account/account_profile');
-    }
-
-    // Retrieve sign in user
-    $data['account'] = $this->Account_model->get_by_id($this->session->userdata('account_id'));
+    $data = $this->authentication->initialize(TRUE, 'admin/manage_roles', NULL, 'retrieve_roles');
 
     // Get all permossions, roles, and role_permissions
     $roles = $this->Acl_role_model->get();
@@ -81,31 +75,37 @@ class Manage_roles extends CI_Controller {
 
 
     // Load manage roles view
-    $this->load->view('admin/manage_roles', $data);
+    $data['content'] = $this->load->view('admin/manage_roles', $data, true);
+    $this->load->view('template', $data);
   }
 
 
   /**
-   * Manage Roles
+   * Create/Edit role
+   *
+   * If role if is passed in, it will allow to edit the given role.
+   * If NULL, then it will show form to create a new role.
+   *
+   * @param int $id Role ID
+   * 
    */
-  function save($id=null)
+  function save($id = NULL)
   {
     // Keep track if this is a new role
     $is_new = empty($id);
 
-    // Enable SSL?
-    maintain_ssl($this->config->item("ssl_enabled"));
+    $data = $this->authentication->initialize(TRUE, 'admin/manage_roles');
 
-    // Redirect unauthenticated users to signin page
-    if ( ! $this->authentication->is_signed_in())
+    // Check if they are allowed to Update Roles
+    if ( ! $this->authorization->is_permitted('update_roles') && ! empty($id) )
     {
-      redirect('account/sign_in/?continue='.urlencode(base_url().'admin/manage_roles'));
+      redirect('admin/manage_permissions');
     }
 
-    // Redirect unauthorized users to account profile page
-    if ( ! $this->authorization->is_permitted('retrieve_roles'))
+    // Check if they are allowed to Create Roles
+    if ( ! $this->authorization->is_permitted('create_roles') && empty($id) )
     {
-      redirect('account/account_profile');
+      redirect('admin/manage_permissions');
     }
 
     // Set action type (create or update role)
@@ -125,12 +125,9 @@ class Manage_roles extends CI_Controller {
       $data['action'] = 'update';
       $data['is_system'] = ($data['role']->is_system == 1);
     }
-
-    // Retrieve sign in user
-    $data['account'] = $this->Account_model->get_by_id($this->session->userdata('account_id'));
-
+    
     // Setup form validation
-    $this->form_validation->set_error_delimiters('<div class="field_error">', '</div>');
+    $this->form_validation->set_error_delimiters('<div class="alert alert-danger">', '</div>');
     $this->form_validation->set_rules(
       array(
         array(
@@ -196,14 +193,15 @@ class Manage_roles extends CI_Controller {
     }
 
     // Load manage roles view
-    $this->load->view('admin/manage_roles_save', $data);
+    $data['content'] = $this->load->view('admin/manage_roles_save', $data, TRUE);
+    $this->load->view('template', $data);
   }
 
   /**
    * Check if the role name exist
    *
    * @access public
-   * @param string
+   * @param string $role_name
    * @return bool
    */
   function name_check($role_name)

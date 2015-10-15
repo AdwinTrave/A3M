@@ -1,8 +1,32 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+/**
+ * A3M (Account Authentication & Authorization) is a CodeIgniter 3.x package.
+ * It gives you the CRUD to get working right away without too much fuss and tinkering!
+ * Designed for building webapps from scratch without all that tiresome login / logout / admin stuff thats always required.
+ *
+ * @link https://github.com/donjakobo/A3M GitHub repository
+ */
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Authorization {
-
+/**
+ * A3M Authorization library
+ *
+ * @package A3M
+ * @subpackage Libraries
+ */
+class Authorization
+{
+  /**
+   * The CI object
+   * @var object
+   */
   var $CI;
+
+  /**
+   * Array of all the permissions so that they don't have to be constantly loaded from the database
+   * @var array
+   */
+  private $_account_permissions_cache = array();
 
   /**
    * Constructor
@@ -12,15 +36,9 @@ class Authorization {
     // Obtain a reference to the ci super object
     $this->CI =& get_instance();
 
-    //Load the session, if CI2 load it as library, if it is CI3 load as a driver
-    if (substr(CI_VERSION, 0, 1) == '2')
-    {
-      $this->CI->load->library('session');
-    }
-    else
-    {
-      $this->CI->load->driver('session');
-    }
+    $this->CI->load->driver('session');
+
+    log_message('debug', 'Authorization Class Initalized');
   }
 
   /**
@@ -28,7 +46,8 @@ class Authorization {
    *
    * @access public
    * @param array/string $permission_keys
-   * @return bool
+   * @param boolean $require_all
+   * @return boolean
    */
   function is_permitted($permission_keys, $require_all = FALSE)
   {
@@ -36,69 +55,52 @@ class Authorization {
 
     $this->CI->load->model('account/Acl_permission_model');
 
-    $account_permissions = $this->CI->Acl_permission_model->get_by_account_id($account_id);
+    if (isset($this->_account_permissions_cache[$account_id]))
+    {
+        $account_permissions = $this->_account_permissions_cache[$account_id];
+    }
+    else
+    {
+        $account_permissions = array();
+        $permissions = $this->CI->Acl_permission_model->get_by_account_id($account_id);
+        $this->_account_permissions_cache[$account_id] = $account_permissions;
+        foreach ($permissions as $perm)
+        {
+            $account_permissions[] = $perm->key;
+        }
+    }
 
-    // Loop through and check if the account 
+    // Loop through and check if the account
     // has any of the permission keys supplied
     if (isset($permission_keys))
     {
-      foreach ($account_permissions as $perm) 
-      {
-        // Array of permission keys
-        if (gettype($permission_keys) == 'array')
+        if ( ! is_array($permission_keys))
         {
-          foreach ($permission_keys as $key) 
-          {
-            // Return if only a single one is required.
-            if( $perm->key == $key && ! $require_all ) 
-            {
-              return TRUE;
-            } 
-            // Only takes one bad apple
-            elseif ($perm->key != $key && $require_all)
-            {
-              return FALSE;
-            }
-          }
+            $permission_keys = [$permission_keys];
         }
-        // Single permission key
+
+        $permitted = array_intersect($permission_keys, $account_permissions);
+        if ($require_all)
+        {
+            return count($permitted) == count($permission_keys);
+        }
         else
         {
-          // Return if only a single one is required.
-          if ($perm->key == $permission_keys && ! $require_all ) 
-          {
-            return TRUE;
-          }
-          // Only takes one bad apple
-          elseif ($perm->key != $permission_keys && $require_all) 
-          {
-            return FALSE;
-          }
+            return count($permitted) > 0;
         }
-      }
+
     }
 
-    // If nothing above matched for single 
-    // permission, then this is false.
-    if (! $require_all)
-    {
-      return FALSE;
-    }
-    // If it made this this far and all are 
-    // required, then all is fine in the world
-    else
-    {
-      return TRUE;
-    }
+    return FALSE;
   }
-  
+
   // --------------------------------------------------------------------
-  
+
   /**
    * Check if user is admin
    *
    * @access public
-   * @return bool
+   * @return boolean
    */
   function is_admin()
   {
@@ -108,27 +110,65 @@ class Authorization {
 
     return $this->CI->Acl_role_model->has_role('Admin', $account_id);
   }
-  
+
   // --------------------------------------------------------------------
-  
+
   /**
    * Check if user is a specific role
    *
    * @access public
-   * @param string $role
-   * @return bool
+   * @param string/array $roles
+   * @param boolean $require_all
+   * @return boolean
    */
-  function is_role($role)
+  function is_role($roles, $require_all = FALSE)
   {
     $account_id = $this->CI->session->userdata('account_id');
-    
+
     $this->CI->load->model('account/Acl_role_model');
-    
-    return $this->CI->Acl_role_model->has_role($role, $account_id);
+
+    $account_roles = $this->CI->Acl_role_model->get_by_account_id($account_id);
+
+    // Loop through and check if the account
+    // has any of the permission keys supplied
+    if (isset($roles))
+    {
+      foreach ($account_roles as $perm)
+      {
+        // Array of permission keys
+        if (is_array($roles))
+        {
+          foreach($roles as $role)
+          {
+            // Return if only a single one is required.
+            if(strtolower($perm->name) == strtolower($role) && ! $require_all )
+            {
+              return TRUE;
+            }
+            // Only takes one bad apple
+            elseif(strtolower($perm->name) != strtolower($role) && $require_all)
+            {
+              return FALSE;
+            }
+          }
+        }
+        // Single permission key
+        else
+        {
+          // Return if only a single one is required.
+          if (strtolower($perm->name) == strtolower($roles) && ! $require_all )
+          {
+            return TRUE;
+          }
+          // Only takes one bad apple
+          elseif (strtolower($perm->name) != strtolower($roles) && $require_all)
+          {
+            return FALSE;
+          }
+        }
+      }
+    }
   }
-
 }
-
-
 /* End of file Authorization.php */
 /* Location: ./application/account/libraries/Authorization.php */

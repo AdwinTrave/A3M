@@ -1,6 +1,24 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+/**
+ * A3M (Account Authentication & Authorization) is a CodeIgniter 3.x package.
+ * It gives you the CRUD to get working right away without too much fuss and tinkering!
+ * Designed for building webapps from scratch without all that tiresome login / logout / admin stuff thats always required.
+ *
+ * @link https://github.com/donjakobo/A3M GitHub repository
+ */
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Rel_account_role_model extends CI_Model {
+/**
+ * Rel_account_role
+ *
+ * Model for the Rel_account_role table.
+ * Managing user's assigned roles
+ *
+ * @package A3M
+ * @subpackage Models
+ */
+class Rel_account_role_model extends CI_Model
+{
 
   /**
    * Get all account roles
@@ -10,7 +28,7 @@ class Rel_account_role_model extends CI_Model {
    */
   function get()
   {
-    return $this->db->get('a3m_rel_account_role')->result();
+    return $this->db->get($this->db->dbprefix .'a3m_rel_account_role')->result();
   }
 
   /**
@@ -22,10 +40,10 @@ class Rel_account_role_model extends CI_Model {
    */
   function get_by_account_id($account_id)
   {
-    $this->db->select('a3m_acl_role.*');
-    $this->db->from('a3m_rel_account_role');
-    $this->db->join('a3m_acl_role', 'a3m_rel_account_role_model.role_id = a3m_acl_role.id');
-    $this->db->where("a3m_rel_account_role_model.account_id = $account_id AND a3m_acl_role.suspendedon IS NULL");
+    $this->db->select($this->db->dbprefix . 'a3m_acl_role.*');
+    $this->db->from($this->db->dbprefix . 'a3m_rel_account_role');
+    $this->db->join($this->db->dbprefix . 'a3m_acl_role', $this->db->dbprefix . 'a3m_rel_account_role.role_id = '.$this->db->dbprefix . 'a3m_acl_role.id');
+    $this->db->where($this->db->dbprefix . "a3m_rel_account_role.account_id = $account_id AND ".$this->db->dbprefix . "a3m_acl_role.suspendedon IS NULL");
 
     return $this->db->get()->result();
   }
@@ -40,7 +58,7 @@ class Rel_account_role_model extends CI_Model {
    */
   function exists($account_id, $role_id) 
   {
-    $this->db->from('a3m_rel_account_role');
+    $this->db->from($this->db->dbprefix . 'a3m_rel_account_role');
     $this->db->where('account_id', $account_id);
     $this->db->where('role_id', $role_id);
 
@@ -62,7 +80,7 @@ class Rel_account_role_model extends CI_Model {
     // Insert
     if (!$this->exists($account_id, $role_id))
     {
-      $this->db->insert('a3m_rel_account_role', array('account_id' => $account_id, 'role_id' => $role_id));
+      $this->db->insert($this->db->dbprefix . 'a3m_rel_account_role', array('account_id' => $account_id, 'role_id' => $role_id));
     }
   }
 
@@ -90,7 +108,7 @@ class Rel_account_role_model extends CI_Model {
       }
 
       // Insert all the new roles
-      $this->db->insert_batch('a3m_rel_account_role', $batch);
+      $this->db->insert_batch($this->db->dbprefix . 'a3m_rel_account_role', $batch);
     }
   }
 
@@ -121,7 +139,7 @@ class Rel_account_role_model extends CI_Model {
    */
   function delete($account_id, $role_id)
   {
-    $this->db->delete('a3m_rel_account_role', array('account_id' => $account_id, 'role_id' => $role_id));
+    $this->db->delete($this->db->dbprefix . 'a3m_rel_account_role', array('account_id' => $account_id, 'role_id' => $role_id));
   }
 
 
@@ -135,7 +153,7 @@ class Rel_account_role_model extends CI_Model {
    */
   function delete_by_account($account_id)
   {
-    $this->db->delete('a3m_rel_account_role', array('account_id' => $account_id));
+    $this->db->delete($this->db->dbprefix . 'a3m_rel_account_role', array('account_id' => $account_id));
   }
 
 
@@ -149,7 +167,7 @@ class Rel_account_role_model extends CI_Model {
    */
   function delete_by_role($role_id)
   {
-    $this->db->delete('a3m_rel_account_role', array('role_id' => $role_id));
+    $this->db->delete($this->db->dbprefix . 'a3m_rel_account_role', array('role_id' => $role_id));
   }
 }
 

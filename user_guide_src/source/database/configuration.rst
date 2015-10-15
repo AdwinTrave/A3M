@@ -27,7 +27,6 @@ prototype::
 		'char_set' => 'utf8',
 		'dbcollat' => 'utf8_general_ci',
 		'swap_pre' => '',
-		'autoinit' => TRUE,
 		'encrypt' => FALSE,
 		'compress' => FALSE,
 		'stricton' => FALSE,
@@ -70,7 +69,6 @@ These failovers can be specified by setting the failover for a connection like t
 				'char_set' => 'utf8',
 				'dbcollat' => 'utf8_general_ci',
 				'swap_pre' => '',
-				'autoinit' => TRUE,
 				'encrypt' => FALSE,
 				'compress' => FALSE,
 				'stricton' => FALSE
@@ -89,7 +87,6 @@ These failovers can be specified by setting the failover for a connection like t
 				'char_set' => 'utf8',
 				'dbcollat' => 'utf8_general_ci',
 				'swap_pre' => '',
-				'autoinit' => TRUE,
 				'encrypt' => FALSE,
 				'compress' => FALSE,
 				'stricton' => FALSE
@@ -120,7 +117,6 @@ example, to set up a "test" environment you would do this::
 		'char_set' => 'utf8',
 		'dbcollat' => 'utf8_general_ci',
 		'swap_pre' => '',
-		'autoinit' => TRUE,
 		'compress' => FALSE,
 		'encrypt' => FALSE,
 		'stricton' => FALSE,
@@ -141,7 +137,8 @@ Query Builder
 
 The :doc:`Query Builder Class <query_builder>` is globally enabled or
 disabled by setting the $query_builder variable in the database
-configuration file to TRUE/FALSE (boolean). If you are not using the
+configuration file to TRUE/FALSE (boolean). The default setting is TRUE.
+If you are not using the
 query builder class, setting it to FALSE will utilize fewer resources
 when the database classes are initialized.
 
@@ -164,9 +161,9 @@ Explanation of Values:
 **password**		The password used to connect to the database.
 **database**		The name of the database you want to connect to.
 **dbdriver**		The database type. ie: mysqli, postgre, odbc, etc. Must be specified in lower case.
-**dbprefix**		An optional table prefix which will added to the table name when running :doc:
-			`Query Builder <query_builder>` queries. This permits multiple CodeIgniter installations
-			to share one database.
+**dbprefix**		An optional table prefix which will added to the table name when running
+			:doc:`Query Builder <query_builder>` queries. This permits multiple CodeIgniter
+			installations to share one database.
 **pconnect**		TRUE/FALSE (boolean) - Whether to use a persistent connection.
 **db_debug**		TRUE/FALSE (boolean) - Whether database errors should be displayed.
 **cache_on**		TRUE/FALSE (boolean) - Whether database query caching is enabled,
@@ -180,8 +177,6 @@ Explanation of Values:
 **swap_pre**		A default table prefix that should be swapped with dbprefix. This is useful for distributed
 			applications where you might run manually written queries, and need the prefix to still be
 			customizable by the end user.
-**autoinit**		Whether or not to automatically connect to the database when the library loads. If set to false,
-			the connection will take place prior to executing the first query.
 **schema**		The database schema, defaults to 'public'. Used by PostgreSQL and ODBC drivers.
 **encrypt**		Whether or not to use an encrypted connection.
 **compress**		Whether or not to use client compression (MySQL only).

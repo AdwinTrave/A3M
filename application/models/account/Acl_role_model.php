@@ -1,6 +1,24 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+/**
+ * A3M (Account Authentication & Authorization) is a CodeIgniter 3.x package.
+ * It gives you the CRUD to get working right away without too much fuss and tinkering!
+ * Designed for building webapps from scratch without all that tiresome login / logout / admin stuff thats always required.
+ *
+ * @link https://github.com/donjakobo/A3M GitHub repository
+ */
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Acl_role_model extends CI_Model {
+/**
+ * Acl_role_model
+ *
+ * Model for the Acl_role table.
+ * Holds role information.
+ *
+ * @package A3M
+ * @subpackage Models
+ */
+class Acl_role_model extends CI_Model
+{
 
   /**
    * Get all roles
@@ -10,7 +28,7 @@ class Acl_role_model extends CI_Model {
    */
   function get()
   {
-    return $this->db->get('a3m_acl_role')->result();
+    return $this->db->get($this->db->dbprefix . 'a3m_acl_role')->result();
   }
 
   // --------------------------------------------------------------------
@@ -24,7 +42,7 @@ class Acl_role_model extends CI_Model {
    */
   function get_by_id($role_id)
   {
-    return $this->db->get_where('a3m_acl_role', array('id' => $role_id))->row();
+    return $this->db->get_where($this->db->dbprefix . 'a3m_acl_role', array('id' => $role_id))->row();
   }
 
   // --------------------------------------------------------------------
@@ -38,7 +56,7 @@ class Acl_role_model extends CI_Model {
    */
   function get_by_name($role_name)
   {
-    return $this->db->get_where('a3m_acl_role', array('name' => $role_name))->row();
+    return $this->db->get_where($this->db->dbprefix . 'a3m_acl_role', array('name' => $role_name))->row();
   }
 
   // --------------------------------------------------------------------
@@ -52,10 +70,10 @@ class Acl_role_model extends CI_Model {
    */
   function get_by_account_id($account_id)
   {
-    $this->db->select('a3m_acl_role.*');
-    $this->db->from('a3m_acl_role');
-    $this->db->join('a3m_rel_account_role', 'a3m_acl_role.id = a3m_rel_account_role.role_id');
-    $this->db->where("a3m_rel_account_role.account_id = $account_id AND a3m_acl_role.suspendedon IS NULL");
+    $this->db->select($this->db->dbprefix . 'a3m_acl_role.*');
+    $this->db->from($this->db->dbprefix . 'a3m_acl_role');
+    $this->db->join($this->db->dbprefix . 'a3m_rel_account_role', $this->db->dbprefix . 'a3m_acl_role.id = '.$this->db->dbprefix . 'a3m_rel_account_role.role_id');
+    $this->db->where($this->db->dbprefix . "a3m_rel_account_role.account_id = $account_id AND ".$this->db->dbprefix . "a3m_acl_role.suspendedon IS NULL");
     
     return $this->db->get()->result();
   }
@@ -73,7 +91,7 @@ class Acl_role_model extends CI_Model {
   {
     // SELECT COUNT(account_id) FROM a3m_rel_account_role WHERE role_id=1 GROUP BY role_id
     $this->db->select('account_id');
-    $this->db->from('a3m_rel_account_role');
+    $this->db->from($this->db->dbprefix . 'a3m_rel_account_role');
     $this->db->where('role_id', $role_id);
     $query = $this->db->get();
 
@@ -92,10 +110,10 @@ class Acl_role_model extends CI_Model {
    */
   function has_role($role_name, $account_id)
   {
-    $this->db->select('a3m_acl_role.*');
-    $this->db->from('a3m_acl_role');
-    $this->db->join('a3m_rel_account_role', 'a3m_acl_role.id = a3m_rel_account_role.role_id');
-    $this->db->where("a3m_rel_account_role.account_id = $account_id AND a3m_acl_role.suspendedon IS NULL AND a3m_acl_role.name = '$role_name'");
+    $this->db->select($this->db->dbprefix . 'a3m_acl_role.*');
+    $this->db->from($this->db->dbprefix . 'a3m_acl_role');
+    $this->db->join($this->db->dbprefix . 'a3m_rel_account_role', $this->db->dbprefix . 'a3m_acl_role.id = '.$this->db->dbprefix . 'a3m_rel_account_role.role_id');
+    $this->db->where($this->db->dbprefix . "a3m_rel_account_role.account_id = $account_id AND ".$this->db->dbprefix . "a3m_acl_role.suspendedon IS NULL AND a3m_acl_role.name = '$role_name'");
     
     return ($this->db->count_all_results() > 0);
   }
@@ -116,12 +134,12 @@ class Acl_role_model extends CI_Model {
     if ($this->get_by_id($role_id))
     {
       $this->db->where('id', $role_id);
-      $this->db->update('a3m_acl_role', $attributes);
+      $this->db->update($this->db->dbprefix . 'a3m_acl_role', $attributes);
     }
     // Insert
     else
     {
-      $this->db->insert('a3m_acl_role', $attributes);
+      $this->db->insert($this->db->dbprefix . 'a3m_acl_role', $attributes);
       $role_id = $this->db->insert_id();
     }
 
@@ -141,7 +159,7 @@ class Acl_role_model extends CI_Model {
   {
     $this->load->helper('date');
 
-    $this->db->update('a3m_acl_role', array('suspendedon' => mdate('%Y-%m-%d %H:%i:%s', now())), array('id' => $role_id));
+    $this->db->update($this->db->dbprefix . 'a3m_acl_role', array('suspendedon' => mdate('%Y-%m-%d %H:%i:%s', now())), array('id' => $role_id));
   }
 
   // --------------------------------------------------------------------
@@ -155,7 +173,7 @@ class Acl_role_model extends CI_Model {
    */
   function remove_suspended_datetime($role_id)
   {
-    $this->db->update('a3m_acl_role', array('suspendedon' => NULL), array('id' => $role_id));
+    $this->db->update($this->db->dbprefix . 'a3m_acl_role', array('suspendedon' => NULL), array('id' => $role_id));
   }
 
   // --------------------------------------------------------------------
@@ -169,9 +187,8 @@ class Acl_role_model extends CI_Model {
    */
   function delete($role_id)
   {
-    $this->db->delete('a3m_acl_role', array('id' => $role_id));
+    $this->db->delete($this->db->dbprefix . 'a3m_acl_role', array('id' => $role_id));
   }
 }
-
 /* End of file Acl_role_model.php */
 /* Location: ./application/models/account/Acl_role_model.php */
