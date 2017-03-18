@@ -1,4 +1,8 @@
+/A3Mv2.komodoproject
+/nbproject/project.xml
+/nbproject/project.properties
 /A3M.komodoproject
 #Ignore log files of any kind
 log-*.php
 
+/nbproject/private/

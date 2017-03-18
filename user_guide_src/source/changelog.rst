@@ -7,18 +7,70 @@ Version 3.1.0
 
 Release Date: Not Released
 
+-  Libraries
 
-Version 3.0.3
+   -  Added UNIX socket connection support to :doc:`Session Library <libraries/sessions>` 'redis' driver.
+
+-  Database
+
+   -  Changed method ``initialize()`` to return void and instead throw a ``RuntimeException`` in case of failure.
+   -  Changed method ``db_connect()`` to always set the connection character set (if supported by the driver) and to fail if it can't.
+   -  Removed method ``db_set_charset()`` and the ability to change a connection character set at runtime.
+
+Version 3.0.4
 =============
 
 Release Date: Not Released
 
+-  General Changes
+
+   -  Updated :doc:`Security Library <libraries/security>` method ``get_random_bytes()`` to use PHP7's ``random_bytes()`` function when possible.
+   -  Updated :doc:`Encryption Library <libraries/security>` method ``create_key()`` to use PHP7's ``random_bytes()`` function when possible.
+
+Bug fixes for 3.0.4
+-------------------
+
+-  Fixed a bug (#4212) - :doc:`Query Builder <database/query_builder>` method ``count_all_results()`` could fail if an ``ORDER BY`` condition is used.
+-  Fixed a bug where :doc:`Form Helper <helpers/form_helper>` functions :php:func:`set_checkbox()`, :php:func:`set_radio()` didn't "uncheck" inputs on a submitted form if the default state is "checked".
+-  Fixed a bug (#4217) - :doc:`Config Library <libraries/config>` method ``base_url()`` didn't use proper formatting for IPv6 when it falls back to ``$_SERVER['SERVER_ADDR']``.
+-  Fixed a bug where :doc:`CAPTCHA Helper <helpers/captcha_helper>` entered an infinite loop while generating a random string.
+-  Fixed a bug (#4223) - :doc:`Database <database/method>` method ``simple_query()`` blindly executes queries without checking if the connection was initialized properly.
+-  Fixed a bug (#4244) - :doc:`Email Library <libraries/email>` could improperly use "unsafe" US-ASCII characters during Quoted-printable encoding.
+-  Fixed a bug (#4245) - :doc:`Database Forge <database/forge>` couldn't properly handle ``SET`` and ``ENUM`` type fields with string values.
+-  Fixed a bug (#4283) - :doc:`String Helper <helpers/string_helper>` function :php:func:`alternator()` couldn't be called without arguments.
+-  Fixed a bug (#4306) - :doc:`Database <database/index>` method ``version()`` didn't work properly with the 'mssql' driver.
+-  Fixed a bug (#4039) - :doc:`Session Library <libraries/sessions>` could generate multiple (redundant) warnings in case of a read failure with the 'files' driver, due to a bug in PHP.
+-  Fixed a bug where :doc:`Session Library <libraries/sessions>` didn't have proper error handling on PHP 5 (due to a PHP bug).
+-  Fixed a bug (#4312) - :doc:`Form Validation Library <libraries/form_validation>` didn't provide error feedback for failed validation on empty requests.
+-  Fixed a bug where :doc:`Database <database/index>` method `version()` returned banner text instead of only the version number with the 'oci8' and 'pdo/oci' drivers.
+
+Version 3.0.3
+=============
+
+Release Date: October 31, 2015
+
+-  **Security**
+
+   -  Fixed an XSS attack vector in :doc:`Security Library <libraries/security>` method ``xss_clean()``.
+   -  Changed :doc:`Config Library <libraries/config>` method ``base_url()`` to fallback to ``$_SERVER['SERVER_ADDR']`` when ``$config['base_url']`` is empty in order to avoid *Host* header injections.
+   -  Changed :doc:`CAPTCHA Helper <helpers/captcha_helper>` to use the operating system's PRNG when possible.
+
 -  Database
 
    -  Optimized :doc:`Database Utility <database/utilities>` method ``csv_from_result()`` for speed with larger result sets.
+   -  Added proper return values to :doc:`Database Transactions <database/transactions>` method ``trans_start()``.
 
 Bug fixes for 3.0.3
 -------------------
+
+-  Fixed a bug (#4170) - :doc:`Database <database/index>` method ``insert_id()`` could return an identity from the wrong scope with the 'sqlsrv' driver.
+-  Fixed a bug (#4179) - :doc:`Session Library <libraries/sessions>` doesn't properly maintain its state after ID regeneration with the 'database' driver on PHP7.
+-  Fixed a bug (#4173) - :doc:`Database Forge <database/forge>` method ``add_key()`` didn't allow creation of non-PRIMARY composite keys after the "bugfix" for #3968.
+-  Fixed a bug (#4171) - :doc:`Database Transactions <database/transactions>` didn't work with nesting in methods ``trans_begin()``, ``trans_commit()``, ``trans_rollback()``.
+-  Fixed a bug where :doc:`Database Transaction <database/transactions>` methods ``trans_begin()``, ``trans_commit()``, ``trans_rollback()`` ignored failures.
+-  Fixed a bug where all :doc:`Database Transaction <database/transactions>` methods returned TRUE while transactions are actually disabled.
+-  Fixed a bug where :doc:`common function <general/common_functions>` :php:func:`html_escape()` modified keys of its array inputs.
+-  Fixed a bug (#4192) - :doc:`Email Library <libraries/email>` wouldn't always have proper Quoted-printable encoding due to a bug in PHP's own ``mb_mime_encodeheader()`` function.
 
 Version 3.0.2
 =============

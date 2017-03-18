@@ -113,7 +113,7 @@ $config['third_party_auth'] = array(
 |
 |	password_reset_expiration		Reset password form will be valid for 30 mins (default)
 |	password_reset_secret 			Reset password token salt. See https://www.grc.com/passwords.htm
-|									* IMPORTANT * Do not reuse the password reset salt else where!
+|									* IMPORTANT * Do not reuse the password reset salt elsewhere!
 |	password_reset_email 			Reset password sender email
 */
 $config['password_reset_expiration'] 	= 1800;
@@ -125,11 +125,11 @@ $config['password_reset_email'] 	= 'no-reply@a3m.net';
 |--------------------------------------------------------------------------
 | Confrimation E-mail for registration
 |--------------------------------------------------------------------------
-|       
+|
 |	account_email_validate               Will send out confirmation email for account email validation
 |       account_email_validation_required    Requires that the e-mail is validated before user can login
-|       account_email_confirm_sender        
-|       
+|       account_email_confirm_sender
+|
 */
 $config['account_email_validate']           = TRUE;
 $config['account_email_validation_required']= TRUE;

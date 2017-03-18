@@ -720,7 +720,7 @@ to FALSE, then this change doesn&#8217;t concern you.</p>
 <li>input-&gt;input_stream()</li>
 </ul>
 </li>
-<li><a class="reference internal" href="../helpers/cookie_helper.html"><em>Cookie Helper</em></a> <tt class="xref php php-func docutils literal"><span class="pre">get_cookie()</span></tt></li>
+<li><a class="reference internal" href="../helpers/cookie_helper.html"><em>Cookie Helper</em></a> <a class="reference internal" href="../helpers/cookie_helper.html#get_cookie" title="get_cookie"><tt class="xref php php-func docutils literal"><span class="pre">get_cookie()</span></tt></a></li>
 </ul>
 </div></blockquote>
 <div class="admonition important">
@@ -839,8 +839,46 @@ Therefore you&#8217;re encouraged to update its usage sooner rather than
 later.</p>
 </div>
 </div>
-<div class="section" id="step-19-remove-usage-of-previously-deprecated-functionalities">
-<h2>Step 19: Remove usage of (previously) deprecated functionalities<a class="headerlink" href="#step-19-remove-usage-of-previously-deprecated-functionalities" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="step-19-make-sure-your-base-url-config-value-is-not-empty">
+<h2>Step 19: Make sure your &#8216;base_url&#8217; config value is not empty<a class="headerlink" href="#step-19-make-sure-your-base-url-config-value-is-not-empty" title="Permalink to this headline">¶</a></h2>
+<p>When <tt class="docutils literal"><span class="pre">$config['base_url']</span></tt> is not set, CodeIgniter tries to automatically
+detect what your website&#8217;s base URL is. This is done purely for convenience
+when you are starting development of a new application.</p>
+<p>Auto-detection is never reliable and also has security implications, which
+is why you should <strong>always</strong> have it manually configured!</p>
+<p>One of the changes in CodeIgniter 3.0.3 is how this auto-detection works,
+and more specifically it now falls back to the server&#8217;s IP address instead
+of the hostname requested by the client. Therefore, if you&#8217;ve ever relied
+on auto-detection, it will change how your website works now.</p>
+<p>In case you need to allow e.g. multiple domains, or both <a class="reference external" href="http://">http://</a> and
+<a class="reference external" href="https://">https://</a> prefixes to be dynamically used depending on the request,
+remember that <em>application/config/config.php</em> is still a PHP script, in
+which you can create this logic with a few lines of code. For example:</p>
+<div class="highlight-ci"><div class="highlight"><pre><span class="nv">$allowed_domains</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;domain1.tld&#39;</span><span class="p">,</span> <span class="s1">&#39;domain2.tld&#39;</span><span class="p">);</span>
+<span class="nv">$default_domain</span>  <span class="o">=</span> <span class="s1">&#39;domain1.tld&#39;</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_HOST&#39;</span><span class="p">],</span> <span class="nv">$allowed_domains</span><span class="p">,</span> <span class="k">TRUE</span><span class="p">))</span>
+<span class="p">{</span>
+        <span class="nv">$domain</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_HOST&#39;</span><span class="p">];</span>
+<span class="p">}</span>
+<span class="k">else</span>
+<span class="p">{</span>
+        <span class="nv">$domain</span> <span class="o">=</span> <span class="nv">$default_domain</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="k">empty</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTPS&#39;</span><span class="p">]))</span>
+<span class="p">{</span>
+        <span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;base_url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;https://&#39;</span><span class="o">.</span><span class="nv">$domain</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">else</span>
+<span class="p">{</span>
+        <span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;base_url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;http://&#39;</span><span class="o">.</span><span class="nv">$domain</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-20-remove-usage-of-previously-deprecated-functionalities">
+<h2>Step 20: Remove usage of (previously) deprecated functionalities<a class="headerlink" href="#step-20-remove-usage-of-previously-deprecated-functionalities" title="Permalink to this headline">¶</a></h2>
 <p>In addition to the <tt class="docutils literal"><span class="pre">$autoload['core']</span></tt> configuration setting, there&#8217;s a
 number of other functionalities that have been removed in CodeIgniter 3.0.0:</p>
 <div class="section" id="the-sha1-library">
@@ -1187,8 +1225,8 @@ sooner rather than later.</p>
 </div>
 </div>
 </div>
-<div class="section" id="step-20-check-your-usage-of-text-helper-highlight-phrase">
-<h2>Step 20: Check your usage of Text helper highlight_phrase()<a class="headerlink" href="#step-20-check-your-usage-of-text-helper-highlight-phrase" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="step-21-check-your-usage-of-text-helper-highlight-phrase">
+<h2>Step 21: Check your usage of Text helper highlight_phrase()<a class="headerlink" href="#step-21-check-your-usage-of-text-helper-highlight-phrase" title="Permalink to this headline">¶</a></h2>
 <p>The default HTML tag used by <a class="reference internal" href="../helpers/text_helper.html"><em>Text Helper</em></a> function
 <tt class="xref py py-func docutils literal"><span class="pre">highlight_phrase()</span></tt> has been changed from <tt class="docutils literal"><span class="pre">&lt;strong&gt;</span></tt> to the new HTML5
 tag <tt class="docutils literal"><span class="pre">&lt;mark&gt;</span></tt>.</p>
@@ -1224,7 +1262,7 @@ in order to avoid backwards compatibility with old browsers:</p>
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014 - 2015, British Columbia Institute of Technology.
-      Last updated on Oct 13, 2015.
+      Last updated on Jan 04, 2016.
     </p>
   </div>
 

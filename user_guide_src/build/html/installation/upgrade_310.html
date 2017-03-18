@@ -32,7 +32,7 @@
   
     <link rel="top" title="CodeIgniter 3.1.0-dev documentation" href="../index.html"/>
         <link rel="up" title="Upgrading From a Previous Version" href="upgrading.html"/>
-        <link rel="next" title="Upgrading from 3.0.2 to 3.0.3" href="upgrade_303.html"/>
+        <link rel="next" title="Upgrading from 3.0.3 to 3.0.4" href="upgrade_304.html"/>
         <link rel="prev" title="Upgrading From a Previous Version" href="upgrading.html"/> 
 
   
@@ -438,6 +438,47 @@ replacing the index.php file with a static one.</p>
 please make copies of them first.</p>
 </div>
 </div>
+<div class="section" id="step-2-change-database-connection-handling">
+<h2>Step 2: Change database connection handling<a class="headerlink" href="#step-2-change-database-connection-handling" title="Permalink to this headline">¶</a></h2>
+<p>&#8220;Loading&#8221; a database, whether by using the <em>config/autoload.php</em> settings
+or manually via calling <tt class="docutils literal"><span class="pre">$this-&gt;load-&gt;database()</span></tt> or the less-known
+<tt class="docutils literal"><span class="pre">DB()</span></tt> function, will now throw a <tt class="docutils literal"><span class="pre">RuntimeException</span></tt> in case of a
+failure.</p>
+<p>In addition, being unable to set the configured character set is now also
+considered a connection failure.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This has been the case for most database drivers in the in the
+past as well (i.e. all but the &#8216;mysql&#8217;, &#8216;mysqli&#8217; and &#8216;postgre&#8217;
+drivers).</p>
+</div>
+<p>What this means is that if you&#8217;re unable to connect to a database, or
+have an erroneous character set configured, CodeIgniter will no longer
+fail silently, but will throw an exception instead.</p>
+<p>You may choose to explicitly catch it (and for that purpose you can&#8217;t use
+<em>config/autoload.php</em> to load the <a class="reference internal" href="../database/index.html"><em>Database Class</em></a>)</p>
+<div class="highlight-ci"><div class="highlight"><pre><span class="k">try</span>
+<span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">load</span><span class="o">-&gt;</span><span class="na">database</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="k">catch</span> <span class="p">(</span><span class="nx">RuntimeException</span> <span class="nv">$e</span><span class="p">)</span>
+<span class="p">{</span>
+        <span class="c1">// Handle the failure</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Or you may leave it to CodeIgniter&#8217;s default exception handler, which would
+log the error message and display an error screen if you&#8217;re running in
+development mode.</p>
+<div class="section" id="remove-db-set-charset-calls">
+<h3>Remove db_set_charset() calls<a class="headerlink" href="#remove-db-set-charset-calls" title="Permalink to this headline">¶</a></h3>
+<p>With the above-mentioned changes, the purpose of the <tt class="docutils literal"><span class="pre">db_set_charset()</span></tt>
+method would now only be to change the connection character set at runtime.
+That doesn&#8217;t make sense and that&#8217;s the reason why most database drivers
+don&#8217;t support it at all.
+Thus, <tt class="docutils literal"><span class="pre">db_set_charset()</span></tt> is no longer necessary and is removed.</p>
+</div>
+</div>
 </div>
 
 
@@ -446,7 +487,7 @@ please make copies of them first.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="upgrade_303.html" class="btn btn-neutral float-right" title="Upgrading from 3.0.2 to 3.0.3">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="upgrade_304.html" class="btn btn-neutral float-right" title="Upgrading from 3.0.3 to 3.0.4">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="upgrading.html" class="btn btn-neutral" title="Upgrading From a Previous Version"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -459,7 +500,7 @@ please make copies of them first.</p>
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014 - 2015, British Columbia Institute of Technology.
-      Last updated on Oct 13, 2015.
+      Last updated on Jan 04, 2016.
     </p>
   </div>
 
